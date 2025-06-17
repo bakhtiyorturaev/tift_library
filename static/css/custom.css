@@ -1,0 +1,38 @@
+/* Additional custom styles */
+.dropdown-menu-wide {
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#member-results {
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+    display: none;
+}
+
+#member-results.show {
+    display: block;
+}
+
+/* Print styles */
+@media print {
+    .sidebar, .navbar, .btn, .no-print {
+        display: none !important;
+    }
+
+    .card {
+        border: none;
+        box-shadow: none;
+    }
+
+    body {
+        padding: 0;
+        background: white;
+    }
+
+    .table {
+        page-break-inside: avoid;
+    }
+}
