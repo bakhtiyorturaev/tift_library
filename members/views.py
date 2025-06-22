@@ -1,4 +1,3 @@
-
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
@@ -96,3 +95,28 @@ class MemberUpdateView(LibrarianTransactionsMixin, LoginRequiredMixin, UpdateVie
         messages.error(self.request,
                        'Ma\'lumotlarni saqlashda xatolik yuz berdi. Iltimos, tekshirib qaytadan urunib ko\'ring.')
         return super().form_invalid(form)
+
+
+class MemberTransactionHistoryView(ListView):
+    model = Transaction
+    template_name = 'members/member_transactions.html'
+    context_object_name = 'transactions'
+    paginate_by = 15
+
+    def get_queryset(self):
+        member_id = self.kwargs.get('pk')
+        self.member = Member.objects.get(pk=member_id)
+
+        # Faqat qaytarilgan transaksiyalarni olish
+        queryset = Transaction.objects.filter(
+            member=self.member,
+            returned=True
+        ).select_related('member', 'created_by').order_by('-given_at')
+
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['member'] = self.member
+        return context
