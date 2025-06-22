@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Talabalar{% endblock %}
+{% block page_title %}Talabalar ro'yxati{% endblock %}
+
+{% block actions %}
+<div class="btn-group">
+    <a href="{% url 'transactions:create' %}" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Yangi ijara
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card search-form">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="search_query" class="form-label">Qidiruv</label>
+                        <input type="text" class="form-control" id="search_query" name="search_query"
+                               value="{{ request.GET.search_query }}" placeholder="Ism, familiya, ID yoki telefon">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">Qidirish</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Talaba ID</th>
+                        <th>Ism - Familiya</th>
+                        <th>Telefon</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in object_list %}
+                    <tr>
+                        <td>{{ member.student_id }}</td>
+                        <td>{{ member.full_name }}</td>
+                        <td>{{ member.phone }}</td>
+                        <td>
+                            <a href="{% url 'members:detail' member.pk %}" class="btn btn-sm btn-outline-primary"
+                               data-bs-toggle="tooltip" title="Ko'rish">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">Talabalar topilmadi</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        &laquo;
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+                {% endif %}
+
+                {% for i in paginator.page_range %}
+                {% if page_obj.number == i %}
+                <li class="page-item active">
+                    <span class="page-link">{{ i }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        {{ i }}
+                    </a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                        &raquo;
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize date pickers
+    flatpickr('.datepicker', {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+
+    // Handle search form submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const url = new URL(window.location.href);
+
+        // Reset page parameter
+        url.searchParams.delete('page');
+
+        // Update URL with form data
+        new FormData(form).forEach((value, key) => {
+            if (value) {
+                url.searchParams.set(key, value);
+            } else {
+                url.searchParams.delete(key);
+            }
+        });
+
+        window.location.href = url.toString();
+    });
+});
+</script>
+{% endblock %}

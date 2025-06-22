@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ member }}{% endblock %}
+{% block page_title %}Talaba ma'lumotlari{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-5">
+            <div class="card-header">
+                <h5 class="card-title">{{ member.full_name }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-3 fw-bold">Talaba ID:</div>
+                    <div class="col-sm-9">{{ member.student_id }}</div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-3 fw-bold">Telefon:</div>
+                    <div class="col-sm-9">{{ member.phone }}</div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-3 fw-bold">Qo'shilgan sana:</div>
+                    <div class="col-sm-9">{{ member.created_at|date:"Y-m-d H:i" }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-3 fw-bold">Yangilangan sana:</div>
+                    <div class="col-sm-9">{{ member.updated_at|date:"Y-m-d H:i" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Amallar</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'transactions:create_for_student' member.pk %}"
+                   class="btn btn-success w-100 mb-2">
+                    <i class="bi bi-journal-plus me-2"></i>Kitob berish
+                </a>
+                <a href="{% url 'members:member_transactions' member.id %}"
+                   class="btn btn-primary w-100 mb-2">
+                    <i class="bi bi-journal-text me-2"></i>Ijara tarixi
+                </a>
+                <a href="{% url 'members:edit' member.id %}"
+                   class="btn btn-primary w-100 mb-2">
+                    <i class="bi bi-journal-text me-2"></i>Malumotlarni o'zgartirish
+                </a>
+                <a href="{% url 'members:list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-left me-2"></i>Orqaga
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Faol ijaralar</h5>
+            </div>
+            <div class="card-body">
+                {% if active_loans %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Kitob</th>
+                                <th>Berilgan sana</th>
+                                <th>Qaytarish sanasi</th>
+                                <th>Holati</th>
+                                <th>Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in active_loans %}
+                            <tr class="{% if loan.is_overdue %}table-danger{% endif %}">
+                                <td>{{ loan.book_title }} - {{ loan.book_id }}</td>
+                                <td>{{ loan.given_at|date:"Y-m-d" }}</td>
+                                <td>{{ loan.return_due_date|date:"Y-m-d" }}</td>
+                                <td>
+                                    {% if loan.days_remaining < 1 %}
+                                    <span class="badge bg-danger">Muddati o'tgan</span>
+                                    {% elif loan.days_remaining == 1  %}
+                                    <span class="badge bg-warning text-dark">Bugun</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">{{ loan.days_remaining }} kun qoldi</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'transactions:return' loan.pk %}"
+                                       class="btn btn-sm btn-outline-success" 
+                                       data-bs-toggle="tooltip" title="Qaytarish">
+                                        <i class="bi bi-journal-check"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-success">Bu talabada ijara yo'q</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

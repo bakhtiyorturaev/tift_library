@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}{% if form.instance.pk %}Talabani tahrirlash{% else %}Yangi talaba qo'shish{% endif %}{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Talabani tahrirlash{% else %}Yangi talaba qo'shish{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Ism va Familiya maydonlari -->
+                    <div class="mb-3">
+                        <label for="{{ form.ful_name.id_for_label }}" class="form-label">Ism Familiya</label>
+                        {% render_field form.full_name class="form-control" %}
+                        {% if form.first_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.first_name.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+<!--                    <div class="mb-3">-->
+<!--                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Familiya</label>-->
+<!--                        {% render_field form.last_name class="form-control" %}-->
+<!--                        {% if form.last_name.errors %}-->
+<!--                        <div class="invalid-feedback d-block">-->
+<!--                            {{ form.last_name.errors.as_text }}-->
+<!--                        </div>-->
+<!--                        {% endif %}-->
+<!--                    </div>-->
+
+                    <!-- Talaba ID maydoni -->
+                    <div class="mb-3">
+                        <label for="{{ form.student_id.id_for_label }}" class="form-label">Talaba ID</label>
+                        {% if form.instance.pk %}
+                            {# Tahrirlash rejimida - faqat o'qish uchun #}
+                            {% render_field form.student_id class="form-control" readonly="readonly" %}
+                        {% else %}
+                            {# Yangi talaba qo'shish rejimida - oddiy input #}
+                            {% render_field form.student_id class="form-control" %}
+                        {% endif %}
+                        {% if form.student_id.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.student_id.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Telefon raqami maydoni -->
+                    <div class="mb-3">
+                        <label for="{{ form.phone.id_for_label }}" class="form-label">Telefon raqami</label>
+                        {% render_field form.phone class="form-control" %}
+                        {% if form.phone.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.phone.errors.as_text }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Tugmalar -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% if form.instance.pk %}{% url 'members:detail' form.instance.pk %}{% else %}{% url 'members:list' %}{% endif %}"
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Ortga
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i> Saqlash
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

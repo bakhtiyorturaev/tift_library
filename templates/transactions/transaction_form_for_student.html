@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Yangi ijara{% endblock %}
+{% block page_title %}Kitobni ijaraga berish{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <!-- 🧍‍♂️ Talaba haqida -->
+                    <h5 class="mb-3">🧍‍♂️ Talaba ma'lumotlari</h5>
+                    <fieldset disabled>
+                        {% for field in member_form %}
+                            <div class="mb-3">
+                                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {% render_field field class="form-control" %}
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+
+                    <hr class="my-4">
+
+                    <!-- 📚 Kitob haqida -->
+                    <h5 class="mb-3">📚 Kitobni ijaraga berish</h5>
+
+                    {% for field in form %}
+                        {% if field.name == "return_due_date" %}
+                            <div class="mb-3">
+                                <label class="form-label" for="{{ field.id_for_label }}">Qaytarish sanasi</label>
+                                {% render_field field class="form-control datetimepicker" %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ field.errors.as_text }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="mb-3">
+                                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {% render_field field class="form-control" %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ field.errors.as_text }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- 🔘 Tugmalar -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'members:detail' member.id %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Ortga
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i> Saqlash
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr('.datetimepicker', {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            allowInput: true,
+            minDate: "today",
+            defaultDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // bugundan 7 kun keyin
+        });
+    });
+</script>
+{% endblock %}

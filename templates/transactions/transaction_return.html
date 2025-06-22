@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Kitobni qaytarish{% endblock %}
+{% block page_title %}Kitobni qaytarish{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5 class="card-title">Ijara ma'lumotlari</h5>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold">Kitob:</div>
+                        <div class="col-sm-8">{{ object.book_title }} - {{ object.book_id }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold">Talaba:</div>
+                        <div class="col-sm-8">{{ object.member }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold">Telefon:</div>
+                        <div class="col-sm-8">{{ object.member.phone }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold">Berilgan sana:</div>
+                        <div class="col-sm-8">{{ object.given_at|date:"Y-m-d H:i" }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 fw-bold">Qaytarish sanasi:</div>
+                        <div class="col-sm-8">{{ object.return_due_date|date:"Y-m-d " }}</div>
+                    </div>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3 form-check">
+                        {{ form.returned }}
+                        <label class="form-check-label" for="{{ form.returned.id_for_label }}">
+                            Kitob qaytarildi
+                        </label>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'members:detail' object.member.pk %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Ortga
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-1"></i> Tasdiqlash
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

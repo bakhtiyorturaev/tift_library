@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Stat Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card primary h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Talabalar soni</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_members|intcomma }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-people fs-2 text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card success h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Ijaradagi kitoblar</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_loans|intcomma }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-book fs-2 text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card danger h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            Muddati o'tganlar</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ overdue_loans.count|intcomma }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-exclamation-triangle fs-2 text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card warning h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Bugun qaytariladiganlar</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ upcoming_returns.count|intcomma }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="bi bi-calendar-check fs-2 text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% if user.is_librarian %}
+<div class="row justify-content">
+
+    <!-- Quick Actions -->
+    <div class="col-12 col-md-10 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="d-flex gap-2 flex-wrap justify-content-center">
+                    <a href="{% url 'transactions:create' %}" class="btn btn-success w-100">
+                        <i class="bi bi-journal-plus me-2"></i>Yangi ijara
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-12 col-md-10 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="d-flex gap-2 flex-wrap justify-content-center">
+                    <a href="{% url 'transactions:list' %}?returned=False" class="btn btn-primary w-100">
+                        <i class="bi bi-journal-check me-2"></i>Faol ijaralar
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Overdue Loans -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-danger">Muddati o'tgan ijaralar</h6>
+            </div>
+            <div class="card-body">
+                {% if overdue_loans %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Kitob</th>
+                                <th>Talaba</th>
+                                <th>Qaytarish sanasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in overdue_loans %}
+                            <tr class="table-danger">
+                                <td>{{ loan.book_title }}</td>
+                                <td>{{ loan.member }}</td>
+                                <td>{{ loan.return_due_date|date:"Y-m-d" }}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'transactions:list' %}?overdue=true" class="btn btn-sm btn-outline-danger">Barchasini ko'rish</a>
+                {% else %}
+                <div class="alert alert-success">Muddati o'tgan ijara yo'q</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Returns -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-warning">Tez orada qaytarilishi kerak</h6>
+            </div>
+            <div class="card-body">
+                {% if upcoming_returns %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Kitob</th>
+                                <th>Talaba</th>
+                                <th>Qaytarish sanasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loan in upcoming_returns %}
+                            <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}">
+                                <td>{{ loan.book_title }} </td>
+                                <td>{{ loan.member }}</td>
+                                <td>
+                                    {{ loan.return_due_date|date:"Y-m-d" }}
+                                    <span class="badge {% if loan.is_overdue %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                        {% if loan.return_due_date|date:"Y-m-d" == today|date:"Y-m-d" %}
+                                            Bugun
+                                        {% elif loan.return_due_date|date:"Y-m-d" == tomorrow|date:"Y-m-d" %}
+                                            Ertaga
+                                        {% endif %}
+                                    </span>
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'transactions:list' %}?due_soon=true" class="btn btn-sm btn-outline-warning">Barchasini ko'rish</a>
+                {% else %}
+                <div class="alert alert-success">Tez orada qaytarilishi kerak bo'lgan kitoblar yo'q</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    if (document.getElementById('loansChart')) {
+        const ctx = document.getElementById('loansChart').getContext('2d');
+        const labels = JSON.parse(document.getElementById('loansChart').dataset.labels);
+        const data = JSON.parse(document.getElementById('loansChart').dataset.values);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Ijaralar soni',
+                    data: data,
+                    backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                    borderColor: 'rgba(78, 115, 223, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

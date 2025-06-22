@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block title %}Yangi ijara{% endblock %}
+{% block page_title %}Kitobni ijaraga berish{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <hr class="my-4">
+
+                    <!-- 🧍‍♂️ Talaba haqida forma (MemberForm) -->
+                    <h5 class="mb-3">🧍‍♂️ Talaba ma'lumotlari </h5>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ member_form.full_name.id_for_label }}">Ism Familiya</label>
+                        {% render_field member_form.full_name class="form-control" list="member-list" autocomplete="off" %}
+                        <datalist id="member-list">
+                            {% for member in members %}
+                            <option value="{{ member.full_name }}" data-student-id="{{ member.student_id }}" data-phone="{{ member.phone }}">
+                                {{ member.student_id }} - {{ member.phone }}
+                            </option>
+                            {% endfor %}
+                        </datalist>
+                        {% if member_form.full_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ member_form.full_name.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ member_form.student_id.id_for_label }}">Talaba ID</label>
+                        {% render_field member_form.student_id class="form-control" id="student-id-field" %}
+                        {% if member_form.student_id.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ member_form.student_id.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ member_form.phone.id_for_label }}">Telefon raqami</label>
+                        {% render_field member_form.phone class="form-control" id="phone-field" %}
+                        <small>Namuna: 901234567</small>
+                        {% if member_form.phone.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ member_form.phone.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- 📚 Kitob haqida forma (TransactionForm qolgan maydonlari) -->
+                    <h5 class="mb-3">📚 Kitobni ijaraga berish</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.book_title.id_for_label }}">Kitob nomi</label>
+                        {% render_field form.book_title class="form-control" %}
+                        {% if form.book_title.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.book_title.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.book_id.id_for_label }}">Kitob ID</label>
+                        {% render_field form.book_id class="form-control" %}
+                        {% if form.book_id.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.book_id.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.return_due_date.id_for_label }}">Qaytarish sanasi</label>
+                        {% render_field form.return_due_date class="form-control datetimepicker" %}
+                        {% if form.return_due_date.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.return_due_date.errors.as_text }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 🔘 Tugmalar -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Ortga
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i> Saqlash
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- JavaScript faylini static papkadan yuklash -->
+<script src="{% static 'js/memberAutocomplete.js' %}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sana va vaqt tanlovi
+    flatpickr('.datetimepicker', {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        allowInput: true,
+        minDate: "today",
+        defaultDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    });
+
+    // Talaba tanlanganda ID va telefonni to'ldirish
+    const fullNameInput = document.querySelector('#{{ member_form.full_name.id_for_label }}');
+    const studentIdField = document.getElementById('student-id-field');
+    const phoneField = document.getElementById('phone-field');
+
+    fullNameInput.addEventListener('input', function() {
+        const selectedOption = document.querySelector(`#member-list option[value="${this.value}"]`);
+        if (selectedOption) {
+            studentIdField.value = selectedOption.getAttribute('data-student-id');
+            phoneField.value = selectedOption.getAttribute('data-phone');
+        }
+    });
+
+    // Talaba ID bo'yicha avtomatik to'ldirish
+    studentIdField.addEventListener('change', function() {
+        if (this.value) {
+            fetch(`/api/check-member/?student_id=${this.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        fullNameInput.value = data.full_name;
+                        phoneField.value = data.phone;
+                    }
+                });
+        }
+    });
+});
+</script>
+
+{% endblock %}
