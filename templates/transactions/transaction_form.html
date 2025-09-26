@@ -16,7 +16,7 @@
                     <hr class="my-4">
 
                     <!-- 🧍‍♂️ Talaba haqida forma (MemberForm) -->
-                    <h5 class="mb-3">🧍‍♂️ Talaba ma'lumotlari </h5>
+                    <h5 class="mb-3">🧍‍♂️ Talaba </h5>
 
                     <div class="mb-3">
                         <label class="form-label" for="{{ member_form.full_name.id_for_label }}">Ism Familiya</label>
@@ -49,22 +49,24 @@
 
                     <!-- Telefon raqami maydoni -->
                     <div class="mb-3">
-                        <label for="{{ form.phone.id_for_label }}" class="form-label">Telefon raqami</label>
+                        <label for="{{ member_form.phone.id_for_label }}" class="form-label">Telefon raqami</label>
                         <div class="input-group">
                             <span class="input-group-text">+998</span>
-                            {% render_field form.phone class="form-control" placeholder="901234567" maxlength="9" %}
+                            {% render_field member_form.phone class="form-control" placeholder="901234567" maxlength="9" %}
                         </div>
-                        {% if form.phone.errors %}
+                        {% if member_form.phone.errors %}
                         <div class="invalid-feedback d-block">
-                            {{ form.phone.errors.as_text }}
+                            {{ member_form.phone.errors.as_text }}
                         </div>
                         {% endif %}
                     </div>
 
 
+
+
                     <hr class="my-4">
                     <!-- 📚 Kitob haqida forma (TransactionForm qolgan maydonlari) -->
-                    <h5 class="mb-3">📚 Kitobni ijaraga berish</h5>
+                    <h5 class="mb-3">📚 Kitob </h5>
 
                     <div class="mb-3">
                         <label class="form-label" for="{{ form.book_title.id_for_label }}">Kitob nomi</label>

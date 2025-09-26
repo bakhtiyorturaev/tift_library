@@ -11,7 +11,7 @@ class Transaction(models.Model):
     book_id = models.CharField(max_length=50, verbose_name='Kitob ID')
     given_at = models.DateTimeField(auto_now_add=True, verbose_name='Berilgan vaqt')
     return_due_date = models.DateTimeField(verbose_name='Qaytarish muddati')
-    returned = models.BooleanField(default=False, verbose_name='Qaytarilganmi')
+    returned = models.BooleanField(default=False, verbose_name='Qaytarilgan')
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,

@@ -28,8 +28,6 @@ class TransactionListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListVi
         returned = request.get('returned')
         given_from = request.get('given_from')
         given_to = request.get('given_to')
-        due_soon = request.get('due_soon')
-        overdue = request.get('overdue')
 
         # Qidiruv
         if search_query:
@@ -40,33 +38,21 @@ class TransactionListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListVi
                 Q(member__phone__icontains=search_query)
             )
 
-        #  Boolean convert
-        if returned in ['True', 'False']:
-            queryset = queryset.filter(returned=(returned == 'True'))
+        # Holat bo‘yicha filter
+        now = timezone.now()
 
-        #  Sana filterlari
+        if returned == 'True':  # Qaytarilgan
+            queryset = queryset.filter(returned=True)
+        elif returned == 'False':  # Faol
+            queryset = queryset.filter(returned=False)
+        elif returned == 'overdue':  # Muddati o'tgan
+            queryset = queryset.filter(returned=False, return_due_date__lt=now)
+
+        # Sana filterlari
         if given_from:
             queryset = queryset.filter(given_at__date__gte=given_from)
         if given_to:
             queryset = queryset.filter(given_at__date__lte=given_to)
-
-        now = timezone.now()
-        soon = now + timedelta(days=2)
-
-        #  Tez orada qaytarilishi kerak bo‘lganlar
-        if due_soon == 'true':
-            queryset = queryset.filter(
-                returned=False,
-                return_due_date__gte=now,
-                return_due_date__lte=soon
-            )
-
-        #  Muddatidan o‘tganlar
-        if overdue == 'true':
-            queryset = queryset.filter(
-                returned=False,
-                return_due_date__lt=now
-            )
 
         return queryset.order_by('returned', 'return_due_date')
 
@@ -78,10 +64,9 @@ class TransactionListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListVi
             'returned': request.get('returned', ''),
             'given_from': request.get('given_from', ''),
             'given_to': request.get('given_to', ''),
-            'due_soon': request.get('due_soon', ''),
-            'overdue': request.get('overdue', ''),
         })
         return context
+
 
 
 class TransactionCreateView(LibrarianTransactionsMixin, LoginRequiredMixin, CreateView):

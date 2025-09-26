@@ -19,10 +19,11 @@ class TransferTransactionsForm(forms.Form):
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('book_title', 'member', 'given_at', 'created_by', 'returned')
-    list_filter = ('returned', 'given_at', )
+    list_filter = ('returned', 'created_by')
     search_fields = ('book_title', 'book_id', 'member__ful_name',)
     raw_id_fields = ('member',)
     actions = ['transfer_transactions_action']
+    list_per_page = 25
 
     def transfer_transactions_action(self, request, queryset):
         """

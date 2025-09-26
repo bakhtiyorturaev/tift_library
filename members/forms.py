@@ -11,8 +11,8 @@ class MemberForm(forms.ModelForm):
             'phone': forms.TextInput(
                 attrs={
                     'class': 'form-control',
-                    'placeholder': '90 1234567',
-                    'maxlength': '10',
+                    'placeholder': '901234567',
+                    'maxlength': '9',
                 }
             ),
         }
@@ -22,12 +22,6 @@ class MemberForm(forms.ModelForm):
             'phone': 'Telefon raqami',
         }
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     if self.instance and self.instance.phone:
-    #         phone = self.instance.phone
-    #         if len(phone) == 9:
-    #             self.initial['phone'] = f"{phone[:2]} {phone[2:]}"
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone', '').replace(' ', '')

@@ -127,7 +127,9 @@
                         </thead>
                         <tbody>
                             {% for loan in overdue_loans %}
-                            <tr class="table-danger">
+                            <tr class="table-danger"
+                                style="cursor: pointer;"
+                                onclick="window.location='{% url 'transactions:return' loan.pk %}'">
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ loan.book_title }}</td>
                                 <td>{{ loan.member }}</td>
@@ -149,7 +151,7 @@
     <div class="col-lg-6 mb-4">
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-warning">Tez orada qaytarilishi kerak</h6>
+                <h6 class="m-0 font-weight-bold text-danger">Tez orada qaytarilishi kerak</h6>
             </div>
             <div class="card-body">
                 {% if upcoming_returns %}
@@ -164,7 +166,9 @@
                         </thead>
                         <tbody>
                             {% for loan in upcoming_returns %}
-                            <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}">
+                            <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}"
+                                onclick="window.location='{% url 'transactions:return' loan.pk %}'"
+                                style="cursor:pointer;"     >
                                 <td>{{ loan.book_title }}</td>
                                 <td>{{ loan.member }}</td>
                                 <td>

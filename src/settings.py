@@ -6,6 +6,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
+ADMIN_URL = os.getenv('ADMIN_URL')
 
 DEBUG = True
 
@@ -127,4 +128,3 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Brauzer yopilganda sessiya tugaydi
 SECURE_SSL_REDIRECT = False  # True har doim HTTPSga yo‘naltiradi
 
 
-ADMIN_URL = os.getenv('ADMIN_URL', 'admin/')

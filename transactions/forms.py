@@ -27,7 +27,7 @@ class TransactionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Default 14 kun keyin qaytarish muddati qo'yiladi
+        # Default 7 kun keyin qaytarish muddati qo'yiladi
         if not self.instance.pk:
             default_due = timezone.now() + timedelta(days=7)
             self.initial.setdefault(
