@@ -5,21 +5,26 @@
 
 {% block content %}
 <div class="row">
+    <!-- Talaba ma'lumotlari -->
     <div class="col-lg-8">
-        <div class="card mb-5">
-            <div class="card-header">
-                <h5 class="card-title">{{ member.full_name }}</h5>
-            </div>
+        <div class="card mb-3">
+<!--            <div class="card-header">-->
+<!--                <h5 class="card-title">{{ member.full_name }}</h5>-->
+<!--            </div>-->
             <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-sm-3 fw-bold">Talaba ID:</div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 fw-bold">Talaba:</div>
+                    <div class="col-sm-9 fw-bold">{{ member.full_name }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-3 fw-bold">ID:</div>
                     <div class="col-sm-9">{{ member.student_id }}</div>
                 </div>
-                <div class="row mb-4">
+                <div class="row mb-2">
                     <div class="col-sm-3 fw-bold">Telefon:</div>
-                    <div class="col-sm-9">{{ member.phone }}</div>
+                    <div class="col-sm-9">{{ member.formatted_phone }}</div>
                 </div>
-                <div class="row mb-4">
+                <div class="row mb-2">
                     <div class="col-sm-3 fw-bold">Qo'shilgan sana:</div>
                     <div class="col-sm-9">{{ member.created_at|date:"Y-m-d H:i" }}</div>
                 </div>
@@ -30,85 +35,118 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Amallar -->
     <div class="col-lg-4">
-        <div class="card">
+        <div class="card mb-4 ">
             <div class="card-header">
                 <h5 class="card-title">Amallar</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body d-flex flex-column">
                 <a href="{% url 'transactions:create_for_student' member.pk %}"
-                   class="btn btn-success w-100 mb-2">
-                    <i class="bi bi-journal-plus me-2"></i>Kitob berish
-                </a>
-                <a href="{% url 'members:member_transactions' member.id %}"
-                   class="btn btn-primary w-100 mb-2">
-                    <i class="bi bi-journal-text me-2"></i>Ijara tarixi
+                   class="btn btn-success w-100 mb-1">
+                    <i class="bi bi-journal-plus me-2"></i>Yangi kitob berish
                 </a>
                 <a href="{% url 'members:edit' member.id %}"
-                   class="btn btn-primary w-100 mb-2">
-                    <i class="bi bi-journal-text me-2"></i>Malumotlarni o'zgartirish
+                   class="btn btn-warning w-100 mb-1">
+                    <i class="bi bi-pencil-square me-2"></i>Ma'lumotlarni o'zgartirish
                 </a>
-                <a href="{% url 'members:list' %}" class="btn btn-outline-secondary w-100">
+                <a href="{% url 'members:list' %}" class="btn btn-outline-secondary w-100 mt-auto">
                     <i class="bi bi-arrow-left me-2"></i>Orqaga
                 </a>
-
             </div>
         </div>
     </div>
 </div>
 
+<!-- Ijaralar tarixi -->
 <div class="row">
     <div class="col-12">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header">
-                <h5 class="card-title">Faol ijaralar</h5>
+                <h5 class="card-title fw-bold">Ijaralar tarixi</h5>
             </div>
             <div class="card-body">
-                {% if active_loans %}
+                {% if loans %}
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover table-sm align-middle">
                         <thead>
                             <tr>
+                                <th>№</th>
                                 <th>Kitob</th>
                                 <th>Berilgan sana</th>
                                 <th>Qaytarish sanasi</th>
                                 <th>Holati</th>
-                                <th>Amallar</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for loan in active_loans %}
-                            <tr class="{% if loan.is_overdue %}table-danger{% endif %}">
+                            {% for loan in loans %}
+                            <tr class="{% if loan.is_overdue %}table-danger{% endif %}"
+                                {% if not loan.returned %}
+                                onclick="window.location='{% url 'transactions:return' loan.pk %}'"
+                                style="cursor:pointer;"
+                                {% endif %}>
+                                <td>{{ forloop.counter }}.</td>
                                 <td>{{ loan.book_title }} - {{ loan.book_id }}</td>
                                 <td>{{ loan.given_at|date:"Y-m-d" }}</td>
                                 <td>{{ loan.return_due_date|date:"Y-m-d" }}</td>
                                 <td>
-                                    {% if loan.days_remaining < 1 %}
-                                    <span class="badge bg-danger">Muddati o'tgan</span>
-                                    {% elif loan.days_remaining == 1  %}
-                                    <span class="badge bg-warning text-dark">Bugun</span>
+                                    {% if loan.returned %}
+                                        <span class="badge bg-success">Qaytarilgan</span>
+                                    {% elif loan.days_remaining < 0 %}
+                                        <span class="badge bg-danger">Muddati o'tgan</span>
+                                    {% elif loan.days_remaining == 0 %}
+                                        <span class="badge bg-warning text-dark">Bugun</span>
                                     {% else %}
-                                    <span class="badge bg-warning text-dark">{{ loan.days_remaining }} kun qoldi</span>
+                                        <span class="badge bg-info text-dark">{{ loan.days_remaining }} kun qoldi</span>
                                     {% endif %}
-                                </td>
-                                <td>
-                                    <a href="{% url 'transactions:return' loan.pk %}"
-                                       class="btn btn-sm btn-outline-success" 
-                                       data-bs-toggle="tooltip" title="Qaytarish">
-                                        <i class="bi bi-journal-check"></i>
-                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mt-3">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">««</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">«</a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">»</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">»»</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                <!-- End Pagination -->
+
                 {% else %}
-                <div class="alert alert-success">Bu talabada ijara yo'q</div>
+                <div class="alert alert-success">Bu talabada hali kitoblar yo'q</div>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% load widget_tweaks %}
 
 {% block title %}{% if form.instance.pk %}Talabani tahrirlash{% else %}Yangi talaba qo'shish{% endif %}{% endblock %}
@@ -23,32 +24,17 @@
                         {% endif %}
                     </div>
 
-<!--                    <div class="mb-3">-->
-<!--                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Familiya</label>-->
-<!--                        {% render_field form.last_name class="form-control" %}-->
-<!--                        {% if form.last_name.errors %}-->
-<!--                        <div class="invalid-feedback d-block">-->
-<!--                            {{ form.last_name.errors.as_text }}-->
-<!--                        </div>-->
-<!--                        {% endif %}-->
-<!--                    </div>-->
-
                     <!-- Talaba ID maydoni -->
                     <div class="mb-3">
                         <label for="{{ form.student_id.id_for_label }}" class="form-label">Talaba ID</label>
-                        {% if form.instance.pk %}
-                            {# Tahrirlash rejimida - faqat o'qish uchun #}
-                            {% render_field form.student_id class="form-control" readonly="readonly" %}
-                        {% else %}
-                            {# Yangi talaba qo'shish rejimida - oddiy input #}
-                            {% render_field form.student_id class="form-control" %}
-                        {% endif %}
+                        {% render_field form.student_id class="form-control" %}
                         {% if form.student_id.errors %}
                         <div class="invalid-feedback d-block">
                             {{ form.student_id.errors.as_text }}
                         </div>
                         {% endif %}
                     </div>
+
 
                     <!-- Telefon raqami maydoni -->
                     <div class="mb-3">
@@ -60,6 +46,7 @@
                         </div>
                         {% endif %}
                     </div>
+
 
                     <!-- Tugmalar -->
                     <div class="d-flex justify-content-between mt-4">

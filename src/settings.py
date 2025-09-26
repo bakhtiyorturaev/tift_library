@@ -121,10 +121,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 
-CSRF_COOKIE_SECURE = True       # Faqat HTTPS orqali yuboriladi
-SESSION_COOKIE_SECURE = True    # HTTPS orqali yuboriladi
+CSRF_COOKIE_SECURE = False       # Faqat HTTPS orqali yuboriladi
+SESSION_COOKIE_SECURE = False    # HTTPS orqali yuboriladi
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Brauzer yopilganda sessiya tugaydi
-SECURE_SSL_REDIRECT = True  # Har doim HTTPSga yo‘naltiradi
+SECURE_SSL_REDIRECT = False  # True har doim HTTPSga yo‘naltiradi
 
 
 ADMIN_URL = os.getenv('ADMIN_URL', 'admin/')

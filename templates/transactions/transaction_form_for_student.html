@@ -12,7 +12,7 @@
                     {% csrf_token %}
 
                     <!-- 🧍‍♂️ Talaba haqida -->
-                    <h5 class="mb-3">🧍‍♂️ Talaba ma'lumotlari</h5>
+                    <h5 class="mb-3 fw-bold">🧍‍♂️ Talaba</h5>
                     <fieldset disabled>
                         {% for field in member_form %}
                             <div class="mb-3">
@@ -25,7 +25,7 @@
                     <hr class="my-4">
 
                     <!-- 📚 Kitob haqida -->
-                    <h5 class="mb-3">📚 Kitobni ijaraga berish</h5>
+                    <h5 class="mb-3 fw-bold">📚 Kitob</h5>
 
                     {% for field in form %}
                         {% if field.name == "return_due_date" %}

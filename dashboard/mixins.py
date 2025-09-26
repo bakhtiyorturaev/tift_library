@@ -1,3 +1,7 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+
+
 class LibrarianTransactionsMixin:
     """
     Faqat hozirgi foydalanuvchining yozuvlarini ko'rsatish uchun mixin.
@@ -12,3 +16,4 @@ class LibrarianTransactionsMixin:
         if user.is_authenticated and user.is_librarian:
             return qs.filter(created_by=user)
         return qs.none()
+

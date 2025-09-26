@@ -1,17 +1,19 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, UpdateView
+from django.core.paginator import Paginator
+from django.db.models import Q, F, ExpressionWrapper, IntegerField, Case, When
+from django.db.models.functions import Now, TruncDate
 
 from dashboard.mixins import LibrarianTransactionsMixin
 from transactions.models import Transaction
-from django.db.models import Q
 from .models import Member
 from .forms import MemberForm
 
 
-class MemberListView(LibrarianTransactionsMixin ,LoginRequiredMixin, ListView):
+class MemberListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListView):
     model = Member
     template_name = 'members/member_list.html'
     paginate_by = 20
@@ -27,7 +29,6 @@ class MemberListView(LibrarianTransactionsMixin ,LoginRequiredMixin, ListView):
                 Q(student_id__icontains=search_query) |
                 Q(phone__icontains=search_query)
             )
-
         if created_from:
             queryset = queryset.filter(created_at__gte=created_from)
 
@@ -38,85 +39,54 @@ class MemberDetailView(LibrarianTransactionsMixin, LoginRequiredMixin, DetailVie
     model = Member
     template_name = 'members/member_detail.html'
     context_object_name = 'member'
+    paginate_by = 15
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         member = self.object
 
-        active_loans = Transaction.objects.filter(
-            member=member,
-            returned=False
-        ).order_by('return_due_date')
+        # Annotatsiya: qoldiq kun va muddati o'tganmi
+        loans = (
+            Transaction.objects.filter(member=member)
+            .annotate(
+                days_left=ExpressionWrapper(
+                    TruncDate(F("return_due_date")) - TruncDate(Now()),
+                    output_field=IntegerField(),
+                ),
+                is_overdue_db=Case(
+                    When(returned=False, return_due_date__lt=Now(), then=True),
+                    default=False,
+                    output_field=IntegerField(),
+                ),
+            )
+            .order_by("returned", "return_due_date")
+        )
 
-        # har bir loan uchun extra atributlar: is_overdue, days_remaining
-        for loan in active_loans:
-            now = timezone.now().date()
-            loan.days_remaining = (loan.return_due_date.date() - now).days
+        # Paginator
+        paginator = Paginator(loans, self.paginate_by)
+        page_obj = paginator.get_page(self.request.GET.get("page"))
 
-        context['active_loans'] = active_loans
+        context.update({
+            "loans": page_obj.object_list,
+            "page_obj": page_obj,
+            "is_paginated": page_obj.has_other_pages(),
+            "paginator": paginator,
+        })
         return context
-
-
-class MemberCreateView(LibrarianTransactionsMixin, LoginRequiredMixin, CreateView):
-    model = Member
-    form_class = MemberForm
-    template_name = 'members/member_form.html'
-    success_url = reverse_lazy('members:list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Yangi talaba qo\'shish'
-        return context
-
-    def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        return super().form_valid(form)
-
 
 class MemberUpdateView(LibrarianTransactionsMixin, LoginRequiredMixin, UpdateView):
     model = Member
     form_class = MemberForm
-    template_name = 'members/forms.html'
+    template_name = 'members/member_update_form.html'
     context_object_name = 'member'
 
     def get_success_url(self):
         return reverse('members:detail', kwargs={'pk': self.object.pk})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Talaba ma\'lumotlarini tahrirlash'
-        return context
-
     def form_valid(self, form):
-        messages.success(self.request, 'Talaba ma\'lumotlari muvaffaqiyatli yangilandi!')
+        messages.success(self.request, 'Talaba ma\'lumotlari muvaffaqiyatli yangilandi! ✅')
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request,
-                       'Ma\'lumotlarni saqlashda xatolik yuz berdi. Iltimos, tekshirib qaytadan urunib ko\'ring.')
+        messages.error(self.request, 'Ma\'lumotlarni saqlashda xatolik yuz berdi! ❌')
         return super().form_invalid(form)
-
-
-class MemberTransactionHistoryView(ListView):
-    model = Transaction
-    template_name = 'members/member_transactions.html'
-    context_object_name = 'transactions'
-    paginate_by = 15
-
-    def get_queryset(self):
-        member_id = self.kwargs.get('pk')
-        self.member = Member.objects.get(pk=member_id)
-
-        # Faqat qaytarilgan transaksiyalarni olish
-        queryset = Transaction.objects.filter(
-            member=self.member,
-            returned=True
-        ).select_related('member', 'created_by').order_by('-given_at')
-
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['member'] = self.member
-        return context

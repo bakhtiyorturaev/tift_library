@@ -25,7 +25,7 @@
                     </div>
                     <div class="col-md-2">
                         <label for="returned" class="form-label">Holati</label>
-                        <select class="form-select" id="returned" name="returned">
+                        <select class="form-select" id="returned" name="returned" onchange="this.form.submit()">
                             <option value="">Barchasi</option>
                             <option value="False" {% if request.GET.returned == 'False' %}selected{% endif %}>Faol</option>
                             <option value="True" {% if request.GET.returned == 'True' %}selected{% endif %}>Topshirilgan</option>
@@ -53,25 +53,30 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
+        <div class="table-responsive book-table-scroll">
+            <table class="table table-hover table-sm">
+                <thead class="table-light sticky-top">
                     <tr>
                         <th>Kitob</th>
                         <th>Talaba</th>
                         <th>Berilgan sana</th>
                         <th>Qaytarish sanasi</th>
                         <th>Holati</th>
-                        <th>Amallar</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for transaction in object_list %}
-                    <tr class="{% if transaction.is_overdue and not transaction.returned %}
-                    table-danger
-                    {% elif transaction.is_due_soon %}
-                    table-warning
-                    {% endif %}">
+                    <tr class="
+                            {% if transaction.is_overdue and not transaction.returned %}
+                                table-danger
+                            {% elif transaction.is_due_soon and not transaction.returned %}
+                                table-warning
+                            {% endif %}
+                        "
+                        {% if not transaction.returned %}
+                            onclick="window.location='{% url 'transactions:return' transaction.pk %}'"
+                            style="cursor: pointer;"
+                        {% endif %}>
                         <td>{{ transaction.book_title }} - {{ transaction.book_id }}</td>
                         <td>{{ transaction.member }}</td>
                         <td>{{ transaction.given_at|date:"Y-m-d" }}</td>
@@ -85,15 +90,6 @@
                             <span class="badge bg-warning text-dark">Tez orada qaytarilishi kerak</span>
                             {% else %}
                             <span class="badge bg-primary">Faol</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if not transaction.returned %}
-                            <a href="{% url 'transactions:return' transaction.pk %}"
-                               class="btn btn-sm btn-outline-success"
-                               data-bs-toggle="tooltip" title="Qaytarish">
-                                <i class="bi bi-journal-check"></i>
-                            </a>
                             {% endif %}
                         </td>
                     </tr>

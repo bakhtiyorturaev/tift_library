@@ -15,8 +15,15 @@ class CustomLoginView(LibrarianTransactionsMixin, LoginView):
     success_url = reverse_lazy('dashboard')
 
 
-class CustomLogoutView(LibrarianTransactionsMixin, LogoutView):
-    template_name = 'users/logout.html'
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('users:login')
+
+    def dispatch(self, request, *args, **kwargs):
+        # Avval logout
+        response = super().dispatch(request, *args, **kwargs)
+        # Keyin sessionni butunlay tozalash
+        request.session.flush()
+        return response
 
 
 class LibrarianCreateView(LibrarianTransactionsMixin, LoginRequiredMixin, CreateView):

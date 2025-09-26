@@ -21,7 +21,7 @@
                     <div class="col-md-4">
                         <label for="search_query" class="form-label">Qidiruv</label>
                         <input type="text" class="form-control" id="search_query" name="search_query"
-                               value="{{ request.GET.search_query }}" placeholder="Ism, familiya, ID yoki telefon">
+                               value="{{ request.GET.search_query }}" placeholder="Ism, Familiya, ID yoki telefon">
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary me-2">Qidirish</button>
@@ -35,27 +35,22 @@
 <div class="row">
     <div class="col-12">
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover table-sm">
                 <thead>
                     <tr>
+                        <th>№</th>
                         <th>Talaba ID</th>
                         <th>Ism - Familiya</th>
                         <th>Telefon</th>
-                        <th>Amallar</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for member in object_list %}
-                    <tr>
+                    <tr onclick="window.location='{% url 'members:detail' member.pk %}'" style="cursor:pointer;">
+                        <td>{{ forloop.counter }}</td>
                         <td>{{ member.student_id }}</td>
                         <td>{{ member.full_name }}</td>
-                        <td>{{ member.phone }}</td>
-                        <td>
-                            <a href="{% url 'members:detail' member.pk %}" class="btn btn-sm btn-outline-primary"
-                               data-bs-toggle="tooltip" title="Ko'rish">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        </td>
+                        <td>{{ member.formatted_phone }}</td>
                     </tr>
                     {% empty %}
                     <tr>

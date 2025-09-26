@@ -5,7 +5,7 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
+<div class="row mb-1 g-3">
     <!-- Stat Cards -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card stat-card primary h-100 py-2">
@@ -13,7 +13,7 @@
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Talabalar soni</div>
+                            Talabalar</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_members|intcomma }}</div>
                     </div>
                     <div class="col-auto">
@@ -64,11 +64,11 @@
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                            Bugun qaytariladiganlar</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ upcoming_returns.count|intcomma }}</div>
+                            2 oyda o‘qilgan kitoblar</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ recent_transactions_count|intcomma }}</div>
                     </div>
                     <div class="col-auto">
-                        <i class="bi bi-calendar-check fs-2 text-gray-300"></i>
+                        <i class="bi bi-book fs-2 text-gray-300"></i>
                     </div>
                 </div>
             </div>
@@ -76,11 +76,11 @@
     </div>
 </div>
 {% if user.is_librarian %}
-<div class="row justify-content">
+<div class="row justify-content g-3">
 
     <!-- Quick Actions -->
     <div class="col-12 col-md-10 col-lg-6">
-        <div class="card shadow mb-4">
+        <div class="card shadow mb-2">
             <div class="card-body">
                 <div class="d-flex gap-2 flex-wrap justify-content-center">
                     <a href="{% url 'transactions:create' %}" class="btn btn-success w-100">
@@ -101,12 +101,12 @@
                     </a>
                 </div>
             </div>
-
         </div>
     </div>
+
 </div>
 
-<div class="row">
+<div class="row g-3">
     <!-- Overdue Loans -->
     <div class="col-lg-6 mb-4">
         <div class="card shadow">
@@ -115,10 +115,11 @@
             </div>
             <div class="card-body">
                 {% if overdue_loans %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
+                <div class="table-responsive dashboard-table-scroll">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light sticky-top">
                             <tr>
+                                <th>№</th>
                                 <th>Kitob</th>
                                 <th>Talaba</th>
                                 <th>Qaytarish sanasi</th>
@@ -127,15 +128,16 @@
                         <tbody>
                             {% for loan in overdue_loans %}
                             <tr class="table-danger">
+                                <td>{{ forloop.counter }}</td>
                                 <td>{{ loan.book_title }}</td>
                                 <td>{{ loan.member }}</td>
-                                <td>{{ loan.return_due_date|date:"Y-m-d" }}
+                                <td>{{ loan.return_due_date|date:"Y-m-d" }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <a href="{% url 'transactions:list' %}?overdue=true" class="btn btn-sm btn-outline-danger">Barchasini ko'rish</a>
+                <a href="{% url 'transactions:list' %}?overdue=true" class="btn btn-sm btn-outline-danger mt-2">Barchasini ko'rish</a>
                 {% else %}
                 <div class="alert alert-success">Muddati o'tgan ijara yo'q</div>
                 {% endif %}
@@ -151,9 +153,9 @@
             </div>
             <div class="card-body">
                 {% if upcoming_returns %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
+                <div class="table-responsive dashboard-table-scroll">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light sticky-top">
                             <tr>
                                 <th>Kitob</th>
                                 <th>Talaba</th>
@@ -163,7 +165,7 @@
                         <tbody>
                             {% for loan in upcoming_returns %}
                             <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}">
-                                <td>{{ loan.book_title }} </td>
+                                <td>{{ loan.book_title }}</td>
                                 <td>{{ loan.member }}</td>
                                 <td>
                                     {{ loan.return_due_date|date:"Y-m-d" }}
@@ -174,20 +176,20 @@
                                             Ertaga
                                         {% endif %}
                                     </span>
-
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <a href="{% url 'transactions:list' %}?due_soon=true" class="btn btn-sm btn-outline-warning">Barchasini ko'rish</a>
+                <a href="{% url 'transactions:list' %}?due_soon=true" class="btn btn-sm btn-outline-warning mt-2">Barchasini ko'rish</a>
                 {% else %}
                 <div class="alert alert-success">Tez orada qaytarilishi kerak bo'lgan kitoblar yo'q</div>
                 {% endif %}
             </div>
         </div>
     </div>
+
 </div>
 {% endif %}
 {% endblock %}
@@ -234,3 +236,72 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.stat-card {
+    border: none;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), #6a82fb);
+    color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.stat-card .col-auto i {
+    font-size: 2.5rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+}
+
+.table {
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+.table thead th {
+    border: none;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--secondary-color);
+}
+.table tbody tr {
+    background: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+.table tbody tr:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+.table tbody td {
+    border: none;
+    padding: 1rem;
+}
+
+
+body {
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+body {
+    background: linear-gradient(135deg, #f8f9fc, #eef2f7);
+}
+:root[data-theme="dark"] body {
+    background: linear-gradient(135deg, #1e1e2f, #2a2d3e);
+}

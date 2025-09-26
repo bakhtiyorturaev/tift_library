@@ -1,6 +1,7 @@
 from django import forms
 from django.utils import timezone
 from .models import Transaction
+from datetime import timedelta
 
 class TransactionForm(forms.ModelForm):
     class Meta:
@@ -24,11 +25,25 @@ class TransactionForm(forms.ModelForm):
         }
 
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Default 14 kun keyin qaytarish muddati qo'yiladi
+        if not self.instance.pk:
+            default_due = timezone.now() + timedelta(days=7)
+            self.initial.setdefault(
+                'return_due_date',
+                default_due.strftime('%Y-%m-%dT%H:%M')
+            )
+
+
     def clean_return_due_date(self):
-        return_due_date = self.cleaned_data['return_due_date']
+        return_due_date = self.cleaned_data.get('return_due_date')
+        if not return_due_date:
+            raise forms.ValidationError("Qaytarish muddati majburiy")
         if return_due_date <= timezone.now():
-            raise forms.ValidationError("Qaytarish muddati hozirgi vaqtdan keyin bo'lishi kerak")
+            raise forms.ValidationError("Qaytarish muddati hozirgi vaqtdan keyin bo‘lishi kerak")
         return return_due_date
+
 
 class TransactionReturnForm(forms.ModelForm):
     class Meta:
@@ -38,5 +53,14 @@ class TransactionReturnForm(forms.ModelForm):
             'returned': 'Kitob qaytarildi',
         }
         widgets = {
-            'returned': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'returned': forms.CheckboxInput(
+                attrs={'class': 'form-check-input', 'id': 'returned-id'}
+            ),
         }
+
+    def clean_returned(self):
+        returned = self.cleaned_data.get('returned')
+        if self.instance.returned and returned:
+            raise forms.ValidationError("Bu kitob allaqachon qaytarilgan")
+        return returned
+

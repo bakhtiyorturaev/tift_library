@@ -29,16 +29,22 @@ class Transaction(models.Model):
     def __str__(self):
         return f"{self.book_title} - {self.book_id} - {self.member}"
 
+    @property
     def is_overdue(self):
+        """Ijara muddati tugagan va qaytarilmagan"""
         return not self.returned and timezone.now() > self.return_due_date
 
+    @property
     def days_remaining(self):
+        """Qaytarishgacha qolgan kunlar soni (agar o‘tgan bo‘lsa manfiy chiqadi)"""
         if self.returned:
             return 0
         remaining = self.return_due_date - timezone.now()
         return remaining.days
 
+    @property
     def is_due_soon(self):
+        """Kitobni qaytarish muddati 2 kun ichida tugasa"""
         if self.returned:
             return False
         now = timezone.now()

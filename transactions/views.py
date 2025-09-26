@@ -1,4 +1,5 @@
 from datetime import timedelta
+from django.contrib import messages
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
@@ -11,7 +12,7 @@ from dashboard.mixins import LibrarianTransactionsMixin
 from members.forms import MemberForm
 from members.models import Member
 from .models import Transaction
-from .forms import TransactionForm
+from .forms import TransactionForm, TransactionReturnForm
 
 
 class TransactionListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListView):
@@ -19,16 +20,18 @@ class TransactionListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListVi
     template_name = 'transactions/transaction_list.html'
     paginate_by = 20
 
-
     def get_queryset(self):
         queryset = super().get_queryset()
-        search_query = self.request.GET.get('search_query')
-        returned = self.request.GET.get('returned')
-        given_from = self.request.GET.get('given_from')
-        given_to = self.request.GET.get('given_to')
-        due_soon = self.request.GET.get('due_soon')
-        overdue = self.request.GET.get('overdue')
+        request = self.request.GET
 
+        search_query = request.get('search_query')
+        returned = request.get('returned')
+        given_from = request.get('given_from')
+        given_to = request.get('given_to')
+        due_soon = request.get('due_soon')
+        overdue = request.get('overdue')
+
+        # Qidiruv
         if search_query:
             queryset = queryset.filter(
                 Q(book_title__icontains=search_query) |
@@ -37,42 +40,47 @@ class TransactionListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListVi
                 Q(member__phone__icontains=search_query)
             )
 
+        #  Boolean convert
         if returned in ['True', 'False']:
-            queryset = queryset.filter(returned=returned)
+            queryset = queryset.filter(returned=(returned == 'True'))
+
+        #  Sana filterlari
         if given_from:
-            queryset = queryset.filter(given_at__gte=given_from)
+            queryset = queryset.filter(given_at__date__gte=given_from)
         if given_to:
-            queryset = queryset.filter(given_at__lte=given_to)
+            queryset = queryset.filter(given_at__date__lte=given_to)
 
-        now_date = timezone.now().date()
-        tomorrow = now_date + timedelta(days=2)
+        now = timezone.now()
+        soon = now + timedelta(days=2)
 
-        # 2 kun ichida qaytarilishi kerak bo'lganlar
+        #  Tez orada qaytarilishi kerak bo‘lganlar
         if due_soon == 'true':
             queryset = queryset.filter(
                 returned=False,
-                return_due_date__gte=now_date,
-                return_due_date__lte=tomorrow
+                return_due_date__gte=now,
+                return_due_date__lte=soon
             )
 
+        #  Muddatidan o‘tganlar
         if overdue == 'true':
             queryset = queryset.filter(
                 returned=False,
-                return_due_date__lt=now_date
+                return_due_date__lt=now
             )
-        return queryset.order_by('returned','return_due_date')
+
+        return queryset.order_by('returned', 'return_due_date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['search_query'] = self.request.GET.get('search_query', '')
-        context['returned'] = self.request.GET.get('returned', '')
-        context['given_from'] = self.request.GET.get('given_from', '')
-        context['given_to'] = self.request.GET.get('given_to', '')
-        context['due_soon'] = self.request.GET.get('due_soon', '')
-        context['overdue'] = self.request.GET.get('overdue', '')
-
-
-
+        request = self.request.GET
+        context.update({
+            'search_query': request.get('search_query', ''),
+            'returned': request.get('returned', ''),
+            'given_from': request.get('given_from', ''),
+            'given_to': request.get('given_to', ''),
+            'due_soon': request.get('due_soon', ''),
+            'overdue': request.get('overdue', ''),
+        })
         return context
 
 
@@ -84,91 +92,106 @@ class TransactionCreateView(LibrarianTransactionsMixin, LoginRequiredMixin, Crea
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['members'] = Member.objects.filter(created_by=self.request.user).order_by('full_name')
-        context['member_form'] = kwargs.get('member_form') or MemberForm()
-        context['transaction_form'] = kwargs.get('transaction_form') or TransactionForm()
+        context.setdefault('member_form', kwargs.get('member_form') or MemberForm())
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = None
-
         member_form = MemberForm(request.POST)
         transaction_form = TransactionForm(request.POST)
 
-        # Talaba ID bo'yicha mavjud talabani tekshirish
+        # Talabani ID bo‘yicha olish yoki yaratish
         student_id = request.POST.get('student_id')
+        member = None
         if student_id:
-            try:
-                member = Member.objects.get(student_id=student_id)
+            member = Member.objects.filter(student_id=student_id).first()
+            if member:
                 member_form = MemberForm(request.POST, instance=member)
-            except Member.DoesNotExist:
-                pass
 
         if member_form.is_valid() and transaction_form.is_valid():
+            # Talabani saqlash
             member = member_form.save(commit=False)
             member.created_by = request.user
             member.save()
 
+            # Ijarani saqlash
             transaction = transaction_form.save(commit=False)
             transaction.member = member
             transaction.created_by = request.user
             transaction.save()
-            return self.form_valid(transaction_form)
-        else:
-            return self.form_invalid(transaction_form, member_form)
 
+            messages.success(request, "Ijara muvaffaqiyatli qo‘shildi ✅")
+            return self.form_valid(transaction_form)
+
+        messages.error(request, "Ma‘lumotlarni tekshiring ❌")
+        return self.form_invalid(transaction_form, member_form)
 
     def form_invalid(self, transaction_form, member_form):
-        """Ikkala formani kontekstga qayta yuboramiz"""
-        return self.render_to_response(self.get_context_data(
-            transaction_form=transaction_form,
-            member_form=member_form
-        ))
+        """Ikkala formani qayta render qilish"""
+        return self.render_to_response(
+            self.get_context_data(
+                form=transaction_form,
+                member_form=member_form
+            )
+        )
 
-class TransactionCreateForStudentView(LibrarianTransactionsMixin, FormView):
+class TransactionCreateForStudentView(LibrarianTransactionsMixin, LoginRequiredMixin, FormView):
     template_name = 'transactions/transaction_form_for_student.html'
     form_class = TransactionForm
 
     def get_success_url(self):
-        pk = self.kwargs.get('pk')
-        return reverse('members:detail', kwargs={'pk': pk})
+        return reverse('members:detail', kwargs={'pk': self.kwargs['pk']})
+
+    def get_member(self):
+        return get_object_or_404(Member, pk=self.kwargs['pk'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pk = self.kwargs['pk']
-        member = get_object_or_404(Member, pk=pk)
+        member = self.get_member()
         member_form = MemberForm(instance=member)
-        for field in member_form.fields.values():
-            field.widget.attrs['readonly'] = True
-            field.widget.attrs['disabled'] = True
 
-        context['member'] = member
-        context['member_form'] = member_form
+        # readonly / disabled qo‘shib qo‘yish
+        for name, field in member_form.fields.items():
+            field.widget.attrs.update({
+                'readonly': True,
+                'disabled': True
+            })
+
+        context.update({
+            'member': member,
+            'member_form': member_form,
+        })
         return context
 
-    def post(self, request, *args, **kwargs):
-        pk = self.kwargs['pk']
-        member = get_object_or_404(Member, pk=pk)
+    def form_valid(self, form):
+        member = self.get_member()
+        transaction = form.save(commit=False)
+        transaction.member = member
+        transaction.created_by = self.request.user
+        transaction.save()
 
-        form = TransactionForm(request.POST)
-        if form.is_valid():
-            transaction = form.save(commit=False)
-            transaction.member = member
-            transaction.created_by = request.user
-            transaction.save()
-            return redirect(self.get_success_url())
+        messages.success(self.request, "Ijara muvaffaqiyatli qo‘shildi ✅")
+        return super().form_valid(form)
 
-        context = self.get_context_data(form=form)
-        return self.render_to_response(context)
+    def form_invalid(self, form):
+        messages.error(self.request, "Xatolik ❌ Ma‘lumotlarni tekshiring.")
+        return super().form_invalid(form)
 
 
 class TransactionReturnView(LibrarianTransactionsMixin, LoginRequiredMixin, UpdateView):
     model = Transaction
-    fields = ['returned']
+    form_class = TransactionReturnForm
     template_name = 'transactions/transaction_return.html'
 
     def get_success_url(self):
-        member_id = self.object.member.pk
-        return reverse_lazy('members:detail', kwargs={'pk': member_id})
+        return reverse('members:detail', kwargs={'pk': self.object.member.pk})
+
+    def form_valid(self, form):
+        messages.success(self.request, "Kitob qaytarildi ✅")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Xatolik ❌ Kitob qaytarilganini belgilashda muammo bo‘ldi.")
+        return super().form_invalid(form)
 
 

@@ -2,19 +2,19 @@ from django import forms
 from .models import Member
 
 class MemberForm(forms.ModelForm):
-    full_name = forms.CharField(
-        required=True,  # agar to'ldirish majburiy bo'lsa
-        label='Ism Familiya',
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        help_text='Talaba ismi va familiyasini yozing, agar mavjud bo‘lsa bazadan tanlanadi'
-    )
-
     class Meta:
         model = Member
         fields = ['full_name', 'student_id', 'phone']
         widgets = {
+            'full_name': forms.TextInput(attrs={'class': 'form-control'}),
             'student_id': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': '90 1234567',
+                    'maxlength': '10',
+                }
+            ),
         }
         labels = {
             'full_name': 'Ism Familiya',
@@ -22,23 +22,27 @@ class MemberForm(forms.ModelForm):
             'phone': 'Telefon raqami',
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.phone:
-            phone = self.instance.phone
-            if phone.startswith('+998'):
-                self.initial['phone'] = phone[4:]
-
-    # Misol uchun, qo'shimcha validatsiya (majburiy to'ldirish)
-    def clean_full_name(self):
-        full_name = self.cleaned_data.get('full_name')
-        if not full_name:
-            raise forms.ValidationError("Ism Familiya maydoni bo‘sh bo‘lishi mumkin emas.")
-        return full_name
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     if self.instance and self.instance.phone:
+    #         phone = self.instance.phone
+    #         if len(phone) == 9:
+    #             self.initial['phone'] = f"{phone[:2]} {phone[2:]}"
 
     def clean_phone(self):
-        phone = self.cleaned_data.get('phone')
-        if not phone:
-            raise forms.ValidationError("Telefon raqami majburiy maydon.")
-        # Qo'shimcha telefon raqami validatsiyasi kiritilishi mumkin
+        phone = self.cleaned_data.get('phone', '').replace(' ', '')
+        if not phone.isdigit() or len(phone) != 9:
+            raise forms.ValidationError(
+                "Telefon raqami faqat 9 xonali bo‘lishi kerak va O‘zbekiston operatorlaridan biri bilan boshlanishi kerak. Masalan: 90 1234567"
+            )
+
+        valid_prefixes = ['20', '36', '33', '50', '55', '61', '62', '65', '66', '67', '69', '70', '71', '72', '73',
+                          '74', '75', '76', '77', '78', '79', '88', '90', '91', '93', '94', '95', '97', '98', '99']
+        if phone[:2] not in valid_prefixes:
+            raise forms.ValidationError(
+                "Telefon raqami O‘zbekiston operatorlaridan biri bilan boshlanishi kerak. Masalan: 90 1234567"
+            )
+
         return phone
+
+

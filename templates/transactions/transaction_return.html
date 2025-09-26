@@ -17,11 +17,11 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 fw-bold">Talaba:</div>
-                        <div class="col-sm-8">{{ object.member }}</div>
+                        <div class="col-sm-8">{{ object.member.full_name }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 fw-bold">Telefon:</div>
-                        <div class="col-sm-8">{{ object.member.phone }}</div>
+                        <div class="col-sm-8">{{ object.member.formatted_phone }}</div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 fw-bold">Berilgan sana:</div>
@@ -35,13 +35,15 @@
                 
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3 form-check">
-                        {{ form.returned }}
-                        <label class="form-check-label" for="{{ form.returned.id_for_label }}">
-                            Kitob qaytarildi
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="returned">
+                        <label class="form-check-label" for="returned">
+                            <i class="bi bi-book"></i> Kitob qaytarildi
                         </label>
                     </div>
-                    
+
+
+
                     <div class="d-flex justify-content-between mt-4">
                         <a href="{% url 'members:detail' object.member.pk %}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-1"></i> Ortga
