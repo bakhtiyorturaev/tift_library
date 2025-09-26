@@ -23,7 +23,7 @@ class TransactionAdmin(admin.ModelAdmin):
     search_fields = ('book_title', 'book_id', 'member__ful_name',)
     raw_id_fields = ('member',)
     actions = ['transfer_transactions_action']
-    list_per_page = 25
+    list_per_page = 20
 
     def transfer_transactions_action(self, request, queryset):
         """

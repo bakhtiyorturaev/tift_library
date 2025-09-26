@@ -8,3 +8,4 @@ class MemberAdmin(admin.ModelAdmin):
     search_fields = ('full_name', 'student_id', 'phone')
     ordering = ('-created_at',)
     date_hierarchy = 'created_at'
+    list_per_page = 20
