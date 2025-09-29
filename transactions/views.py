@@ -78,6 +78,7 @@ class TransactionCreateView(LibrarianTransactionsMixin, LoginRequiredMixin, Crea
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.setdefault('member_form', kwargs.get('member_form') or MemberForm())
+        context['members'] = Member.objects.all()[:10]
         return context
 
     def post(self, request, *args, **kwargs):

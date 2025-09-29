@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load humanize %}
+{% load static %}
 
 {% block title %}Dashboard{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
@@ -241,71 +242,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% endblock %}
 
-
-
-
-
-
-
-
-
-
-
-
-
-.stat-card {
-    border: none;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, var(--primary-color), #6a82fb);
-    color: #fff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.stat-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
-.stat-card .col-auto i {
-    font-size: 2.5rem;
-    padding: 1rem;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-}
-
-.table {
-    border-collapse: separate;
-    border-spacing: 0 0.75rem;
-}
-.table thead th {
-    border: none;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    color: var(--secondary-color);
-}
-.table tbody tr {
-    background: #fff;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
-}
-.table tbody tr:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-}
-.table tbody td {
-    border: none;
-    padding: 1rem;
-}
-
-
-body {
-    transition: background-color 0.4s ease, color 0.4s ease;
-}
-
-body {
-    background: linear-gradient(135deg, #f8f9fc, #eef2f7);
-}
-:root[data-theme="dark"] body {
-    background: linear-gradient(135deg, #1e1e2f, #2a2d3e);
-}

@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.timezone import now
 from django.views.generic import ListView, DetailView, UpdateView
 from django.core.paginator import Paginator
 from django.db.models import Q, F, ExpressionWrapper, IntegerField, Case, When
@@ -35,6 +34,7 @@ class MemberListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListView):
             queryset = queryset.filter(created_at__gte=created_from)
 
         return queryset.order_by('full_name')
+
 
 
 class MemberDetailView(LibrarianTransactionsMixin, LoginRequiredMixin, DetailView):

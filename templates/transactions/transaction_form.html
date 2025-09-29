@@ -4,6 +4,7 @@
 
 {% block title %}Yangi ijara{% endblock %}
 {% block page_title %}Kitobni ijaraga berish{% endblock %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
 {% block content %}
 <div class="row">
@@ -18,13 +19,16 @@
                     <!-- 🧍‍♂️ Talaba haqida forma (MemberForm) -->
                     <h5 class="mb-3">🧍‍♂️ Talaba </h5>
 
+                    <!-- Ism Familiya -->
                     <div class="mb-3">
-                        <label class="form-label" for="{{ member_form.full_name.id_for_label }}">Ism Familiya</label>
-                        {% render_field member_form.full_name class="form-control" list="member-list" autocomplete="off" %}
+                        <label class="form-label" for="full-name-input">Ism Familiya</label>
+                        {% render_field member_form.full_name class="form-control" id="full-name-input" list="member-list" autocomplete="off" %}
                         <datalist id="member-list">
                             {% for member in members %}
-                            <option value="{{ member.full_name }}" data-student-id="{{ member.student_id }}" data-phone="{{ member.phone }}">
-                                {{ member.student_id }} - {{ member.phone }}
+                            <option value="{{ member.full_name }}"
+                                    data-student-id="{{ member.student_id }}"
+                                    data-phone="{{ member.phone }}">
+                                {{ member.phone }}
                             </option>
                             {% endfor %}
                         </datalist>
@@ -35,9 +39,19 @@
                         {% endif %}
                     </div>
 
+                    <!-- Talaba ID -->
                     <div class="mb-3">
-                        <label class="form-label" for="{{ member_form.student_id.id_for_label }}">Talaba ID</label>
-                        {% render_field member_form.student_id class="form-control" id="student-id-field" %}
+                        <label class="form-label" for="student-id-field">Talaba ID</label>
+                        {% render_field member_form.student_id class="form-control" id="student-id-field" list="id-list" autocomplete="off" %}
+                        <datalist id="id-list">
+                            {% for member in members %}
+                            <option value="{{ member.student_id }}"
+                                    data-full-name="{{ member.full_name }}"
+                                    data-phone="{{ member.phone }}">
+                                {{ member.full_name }}
+                            </option>
+                            {% endfor %}
+                        </datalist>
                         {% if member_form.student_id.errors %}
                             <div class="invalid-feedback d-block">
                                 {{ member_form.student_id.errors.as_text }}
@@ -45,23 +59,28 @@
                         {% endif %}
                     </div>
 
-
-
-                    <!-- Telefon raqami maydoni -->
+                    <!-- Telefon raqami -->
                     <div class="mb-3">
-                        <label for="{{ member_form.phone.id_for_label }}" class="form-label">Telefon raqami</label>
+                        <label for="phone-field" class="form-label">Telefon raqami</label>
                         <div class="input-group">
                             <span class="input-group-text">+998</span>
-                            {% render_field member_form.phone class="form-control" placeholder="901234567" maxlength="9" %}
+                            {% render_field member_form.phone class="form-control" id="phone-field" list="phone-list" placeholder="901234567" maxlength="9" autocomplete="off" %}
+                            <datalist id="phone-list">
+                                {% for member in members %}
+                                <option value="{{ member.phone }}"
+                                        data-full-name="{{ member.full_name }}"
+                                        data-student-id="{{ member.student_id }}">
+                                    {{ member.full_name }}
+                                </option>
+                                {% endfor %}
+                            </datalist>
                         </div>
                         {% if member_form.phone.errors %}
-                        <div class="invalid-feedback d-block">
-                            {{ member_form.phone.errors.as_text }}
-                        </div>
+                            <div class="invalid-feedback d-block">
+                                {{ member_form.phone.errors.as_text }}
+                            </div>
                         {% endif %}
                     </div>
-
-
 
 
                     <hr class="my-4">
@@ -116,8 +135,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'flatpickr/l10n/uz.js' %}"></script>
 
-<script src="{% static 'js/memberAutocomplete.js' %}"></script>
 <script src="{% static 'js/transaction_form.js' %}"></script>
-
 {% endblock %}
