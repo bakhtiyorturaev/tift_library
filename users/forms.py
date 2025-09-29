@@ -1,20 +1,8 @@
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import User
+from django.contrib.auth.forms import AuthenticationForm
 
-class LibrarianCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = ('username', 'password1', 'password2')
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.is_librarian = True
-        if commit:
-            user.save()
-        return user
 
 class CustomAuthenticationForm(AuthenticationForm):
     error_messages = {
-        'invalid_login': "Noto'g'ri foydalanuvchi nomi yoki parol kiritildi.",
+        'invalid_login': "Username yoki parol xato.",
         'inactive': "Bu hisob faol emas.",
     }

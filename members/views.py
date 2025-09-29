@@ -1,11 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
+from django.utils.timezone import now
 from django.views.generic import ListView, DetailView, UpdateView
 from django.core.paginator import Paginator
 from django.db.models import Q, F, ExpressionWrapper, IntegerField, Case, When
 from django.db.models.functions import Now, TruncDate
+from django.views.generic.base import View
 
 from dashboard.mixins import LibrarianTransactionsMixin
 from transactions.models import Transaction
@@ -90,3 +92,24 @@ class MemberUpdateView(LibrarianTransactionsMixin, LoginRequiredMixin, UpdateVie
     def form_invalid(self, form):
         messages.error(self.request, 'Ma\'lumotlarni saqlashda xatolik yuz berdi! ❌')
         return super().form_invalid(form)
+
+class ReturnMultipleView(LoginRequiredMixin, LibrarianTransactionsMixin, View):
+    """
+    Bir yoki bir nechta kitobni qaytarilgan deb belgilash uchun view.
+    """
+    def post(self, request, *args, **kwargs):
+        loan_ids = request.POST.getlist("loans")
+
+        if not loan_ids:
+            messages.warning(request, "❌ Kitob tanlanmadi")
+            return redirect(request.META.get("HTTP_REFERER", "members:list"))
+
+        loans = Transaction.objects.filter(pk__in=loan_ids, returned=False)
+        updated_count = loans.update(returned=True)
+
+        if updated_count:
+            messages.success(request, f"✅ {updated_count} ta kitob qaytarildi")
+        else:
+            messages.info(request, "⚠️ Tanlangan kitoblarning hammasi allaqachon qaytarilgan")
+
+        return redirect(request.META.get("HTTP_REFERER", "members:list"))

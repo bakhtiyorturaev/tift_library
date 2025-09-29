@@ -21,12 +21,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Apps
     'users.apps.UsersConfig',
     'members.apps.MembersConfig',
     'transactions.apps.TransactionsConfig',
 
+    # Third party apps
     'widget_tweaks',
     'django.contrib.humanize',
+    'django_crontab',
 
 
 ]
@@ -128,3 +131,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Brauzer yopilganda sessiya tugaydi
 SECURE_SSL_REDIRECT = False  # True har doim HTTPSga yo‘naltiradi
 
 
+CRONJOBS = [
+    ('0 0 * * *', 'transactions.cron_jobs.delete_old_transactions'),
+]
