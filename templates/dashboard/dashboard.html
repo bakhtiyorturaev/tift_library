@@ -116,34 +116,55 @@
             </div>
             <div class="card-body">
                 {% if overdue_loans %}
-                <div class="table-responsive dashboard-table-scroll">
-                    <table class="table table-hover table-sm">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th>№</th>
-                                <th>Kitob</th>
-                                <th>Talaba</th>
-                                <th>Qaytarish sanasi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for loan in overdue_loans %}
-                            <tr class="table-danger"
-                                style="cursor: pointer;"
-                                onclick="window.location='{% url 'transactions:return' loan.pk %}'">
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ loan.book_title }}</td>
-                                <td>{{ loan.member }}</td>
-                                <td>{{ loan.return_due_date|date:"Y-m-d" }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <a href="{% url 'transactions:list' %}?overdue=true" class="btn btn-sm btn-outline-danger mt-2">Barchasini ko'rish</a>
-                {% else %}
-                <div class="alert alert-success">Muddati o'tgan ijara yo'q</div>
-                {% endif %}
+                <form method="post" action="{% url 'transactions:bulk_confirm' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="redirect_to" value="overdue">
+                    <div class="table-responsive dashboard-table-scroll">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>№</th>
+                                    <th>Kitob</th>
+                                    <th>Talaba</th>
+                                    <th>Qaytarish sanasi</th>
+                                    <th class="text-center">Tanlash</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for loan in overdue_loans %}
+                                <tr class="table-danger"
+                                    style="cursor: pointer;"
+                                    onclick="window.location='{% url 'transactions:return' loan.pk %}'">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ loan.book_title }}</td>
+                                    <td>{{ loan.member }}</td>
+                                    <td>{{ loan.return_due_date|date:"Y-m-d" }}</td>
+                                    <td class="no-click text-center" onclick="event.stopPropagation();">
+                                        {% if not loan.returned %}
+                                            <div class="form-check d-flex justify-content-center">
+                                                <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}" onclick="event.stopPropagation();">
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <a href="{% url 'transactions:list' %}?overdue=true"
+                           class="btn btn-sm btn-outline-danger">
+                           Barchasini ko'rish
+                        </a>
+
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            Tasdiqlash
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">Muddati o'tgan ijara yo'q</div>
+                    {% endif %}
+                </form>
             </div>
         </div>
     </div>
@@ -154,44 +175,65 @@
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-danger">Tez orada qaytarilishi kerak</h6>
             </div>
-            <div class="card-body">
-                {% if upcoming_returns %}
-                <div class="table-responsive dashboard-table-scroll">
-                    <table class="table table-hover table-sm">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th>Kitob</th>
-                                <th>Talaba</th>
-                                <th>Qaytarish sanasi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for loan in upcoming_returns %}
-                            <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}"
-                                onclick="window.location='{% url 'transactions:return' loan.pk %}'"
-                                style="cursor:pointer;"     >
-                                <td>{{ loan.book_title }}</td>
-                                <td>{{ loan.member }}</td>
-                                <td>
-                                    {{ loan.return_due_date|date:"Y-m-d" }}
-                                    <span class="badge {% if loan.is_overdue %}bg-danger{% else %}bg-warning text-dark{% endif %}">
-                                        {% if loan.return_due_date|date:"Y-m-d" == today|date:"Y-m-d" %}
-                                            Bugun
-                                        {% elif loan.return_due_date|date:"Y-m-d" == tomorrow|date:"Y-m-d" %}
-                                            Ertaga
+            <form method="post" action="{% url 'transactions:bulk_confirm' %}">
+                {% csrf_token %}
+                <input type="hidden" name="redirect_to" value="due_soon">
+                <div class="card-body">
+                    {% if upcoming_returns %}
+                    <div class="table-responsive dashboard-table-scroll">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Kitob</th>
+                                    <th>Talaba</th>
+                                    <th>Qaytarish sanasi</th>
+                                    <th class="text-center">Tanlash</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for loan in upcoming_returns %}
+                                <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}"
+                                    onclick="window.location='{% url 'transactions:return' loan.pk %}'"
+                                    style="cursor:pointer;"     >
+                                    <td>{{ loan.book_title }}</td>
+                                    <td>{{ loan.member }}</td>
+                                    <td>
+                                        {{ loan.return_due_date|date:"Y-m-d" }}
+                                        <span class="badge {% if loan.is_overdue %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                            {% if loan.return_due_date|date:"Y-m-d" == today|date:"Y-m-d" %}
+                                                Bugun
+                                            {% elif loan.return_due_date|date:"Y-m-d" == tomorrow|date:"Y-m-d" %}
+                                                Ertaga
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="no-click text-center" onclick="event.stopPropagation();">
+                                        {% if not loan.returned %}
+                                            <div class="form-check d-flex justify-content-center">
+                                                <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}" onclick="event.stopPropagation();">
+                                            </div>
                                         {% endif %}
-                                    </span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <a href="{% url 'transactions:list' %}?due_soon=true"
+                           class="btn btn-sm btn-outline-warning mt-2">
+                           Barchasini ko'rish
+                        </a>
+
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            Tasdiqlash
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">Tez orada qaytarilishi kerak bo'lgan kitoblar yo'q</div>
+                    {% endif %}
                 </div>
-                <a href="{% url 'transactions:list' %}?due_soon=true" class="btn btn-sm btn-outline-warning mt-2">Barchasini ko'rish</a>
-                {% else %}
-                <div class="alert alert-success">Tez orada qaytarilishi kerak bo'lgan kitoblar yo'q</div>
-                {% endif %}
-            </div>
+            </form>
         </div>
     </div>
 

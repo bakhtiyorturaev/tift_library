@@ -64,9 +64,7 @@
                 <h5 class="card-title fw-bold">Ijaralar tarixi</h5>
             </div>
             <div class="card-body">
-
                 {% if loans %}
-                <!-- ✅ Form qo‘shildi -->
                 <form method="post" action="{% url 'members:return_multiple' %}">
                     {% csrf_token %}
                     <div class="table-responsive">

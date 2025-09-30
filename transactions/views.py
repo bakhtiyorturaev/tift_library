@@ -181,3 +181,30 @@ class TransactionReturnView(LibrarianTransactionsMixin, LoginRequiredMixin, Upda
         return super().form_invalid(form)
 
 
+from django.views import View
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.urls import reverse
+from .models import Transaction
+
+
+class BulkConfirmView(View):
+    def post(self, request, *args, **kwargs):
+        selected_ids = request.POST.getlist("loans")
+        redirect_to = request.POST.get("redirect_to")
+
+        if not selected_ids:
+            messages.warning(request, "❌ Hech qanday kitob tanlanmadi")
+            return redirect(reverse("transactions:list"))
+
+        # Tanlangan transactionlarni qaytarilgan qilib belgilash
+        Transaction.objects.filter(pk__in=selected_ids).update(returned=True)
+
+        messages.success(request, f"✅ {len(selected_ids)} ta kitob qaytarildi")
+        if redirect_to == "overdue":
+            return redirect(reverse("dashboard:dashboard") + "?overdue=true")
+
+        elif redirect_to == "due_soon":
+            return redirect(reverse("dashboard:dashboard") + "?due_soon=true")
+
+        return redirect(reverse("transactions:list"))

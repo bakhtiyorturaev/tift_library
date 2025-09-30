@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from django.db.models.aggregates import Count
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone

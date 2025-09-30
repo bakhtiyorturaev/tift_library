@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
+{% load static %}
 
 {% block title %}Ijaralar{% endblock %}
 {% block page_title %}Ijaralar tarixi{% endblock %}
@@ -54,56 +55,72 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="table-responsive book-table-scroll">
-            <table class="table table-hover table-sm">
-                <thead class=" sticky-top" data-bs-theme="dark">
-                    <tr>
-                        <th>№</th>
-                        <th>Kitob</th>
-                        <th>Talaba</th>
-                        <th>Berilgan sana</th>
-                        <th>Qaytarish sanasi</th>
-                        <th>Holati</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for transaction in object_list %}
-                    <tr class="
-                            {% if transaction.is_overdue and not transaction.returned %}
-                                table-danger
-                            {% elif transaction.is_due_soon and not transaction.returned %}
-                                table-warning
-                            {% endif %}
-                        "
-                        {% if not transaction.returned %}
-                            onclick="window.location='{% url 'transactions:return' transaction.pk %}'"
-                            style="cursor: pointer;"
-                        {% endif %}>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ transaction.book_title }} - {{ transaction.book_id }}</td>
-                        <td>{{ transaction.member }}</td>
-                        <td>{{ transaction.given_at|date:"Y-m-d" }}</td>
-                        <td>{{ transaction.return_due_date|date:"Y-m-d" }}</td>
-                        <td>
-                            {% if transaction.returned %}
-                            <span class="badge bg-success">Qaytarilgan</span>
-                            {% elif transaction.is_overdue %}
-                            <span class="badge bg-danger">Muddati o'tgan</span>
-                            {% elif transaction.is_due_soon %}
-                            <span class="badge bg-warning text-dark">Tez orada qaytarilishi kerak</span>
-                            {% else %}
-                            <span class="badge bg-primary">Faol</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center">Ijara topilmadi</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        <form method="post" action="{% url 'transactions:bulk_confirm' %}">
+            {% csrf_token %}
+            <div class="table-responsive book-table-scroll">
+                <table class="table table-hover table-sm">
+                    <thead class=" sticky-top" data-bs-theme="dark">
+                        <tr>
+                            <th>№</th>
+                            <th>Kitob</th>
+                            <th>Talaba</th>
+                            <th>Berilgan sana</th>
+                            <th>Qaytarish sanasi</th>
+                            <th>Holati</th>
+                            <th class="text-center">Tanlash</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in object_list %}
+                        <tr class="
+                                {% if transaction.is_overdue and not transaction.returned %}
+                                    table-danger
+                                {% elif transaction.is_due_soon and not transaction.returned %}
+                                    table-warning
+                                {% endif %}
+                            "
+                            {% if not transaction.returned %}
+                                onclick="window.location='{% url 'transactions:return' transaction.pk %}'"
+                                style="cursor: pointer;"
+                            {% endif %}>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ transaction.book_title }} - {{ transaction.book_id }}</td>
+                            <td>{{ transaction.member }}</td>
+                            <td>{{ transaction.given_at|date:"Y-m-d" }}</td>
+                            <td>{{ transaction.return_due_date|date:"Y-m-d" }}</td>
+                            <td>
+                                {% if transaction.returned %}
+                                <span class="badge bg-success">Qaytarilgan</span>
+                                {% elif transaction.is_overdue %}
+                                <span class="badge bg-danger">Muddati o'tgan</span>
+                                {% elif transaction.is_due_soon %}
+                                <span class="badge bg-warning text-dark">Tez orada qaytarilishi kerak</span>
+                                {% else %}
+                                <span class="badge bg-primary">Faol</span>
+                                {% endif %}
+                            </td>
+                            <td class="no-click text-center" onclick="event.stopPropagation();">
+                                {% if not transaction.returned %}
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input" type="checkbox" name="loans" value="{{ transaction.pk }}"  onclick="event.stopPropagation();">
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Ijara topilmadi</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-sm btn-primary mt-2">
+                    Tasdiqlash
+                </button>
+            </div>
+        </form>
 
         {% if is_paginated %}
         <nav aria-label="Page navigation">
@@ -153,34 +170,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize date pickers
-    flatpickr('.datepicker', {
-        dateFormat: "Y-m-d",
-        allowInput: true
-    });
-
-    // Handle search form submission
-    document.querySelector('form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const form = e.target;
-        const url = new URL(window.location.href);
-
-        // Reset page parameter
-        url.searchParams.delete('page');
-
-        // Update URL with form data
-        new FormData(form).forEach((value, key) => {
-            if (value) {
-                url.searchParams.set(key, value);
-            } else {
-                url.searchParams.delete(key);
-            }
-        });
-
-        window.location.href = url.toString();
-    });
-});
-</script>
+<script src="{% static 'js/transaction_list.js' %}"></script>
 {% endblock %}
