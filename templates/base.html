@@ -18,7 +18,7 @@
 <body class="bg-light">
     <div class="container-fluid">
         <div class="row">
-    {% if user.is_librarian %}
+        {% if user.is_librarian %}
             <!-- 📱 Mobile Navbar (faqat kichik ekranlarda ko‘rinadi) -->
             <nav class="navbar navbar-dark bg-dark d-md-none">
                 <div class="container-fluid">
@@ -91,7 +91,7 @@
                         {% block actions %}{% endblock %}
                     </div>
                 </div>
-    {% endif %}
+        {% endif %}
 
                 <!-- Alerts -->
                 {% if messages %}
@@ -113,10 +113,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uz.js"></script>
-    <script src="{% static 'js/date_flatpicker.js' %}"></script>
-
     {% block extra_js %}
     {% endblock %}
-
 </body>
 </html>

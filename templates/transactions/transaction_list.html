@@ -5,8 +5,6 @@
 {% block title %}Ijaralar{% endblock %}
 {% block page_title %}Ijaralar ro'yxati{% endblock %}
 
-{% block extra_css %}
-{% endblock %}
 
 
 {% block actions %}
@@ -75,8 +73,8 @@
                             <th>№</th>
                             <th>Kitob</th>
                             <th>Talaba</th>
-                            <th>Berilgan sana</th>
-                            <th>Qaytarish sanasi</th>
+                            <th>Berilgan </th>
+                            <th>Qaytarish </th>
                             <th>Holati</th>
                             <th class="text-center">Tanlash</th>
                         </tr>
@@ -89,11 +87,7 @@
                                 {% elif transaction.is_due_soon and not transaction.returned %}
                                     table-warning
                                 {% endif %}
-                            "
-                            {% if not transaction.returned %}
-                                onclick="window.location='{% url 'transactions:return' transaction.pk %}'"
-                                style="cursor: pointer;"
-                            {% endif %}>
+                            ">
                             <td>{{ forloop.counter }}</td>
                             <td>{{ transaction.book_title }} - {{ transaction.book_id }}</td>
                             <td>{{ transaction.member }}</td>
@@ -180,8 +174,7 @@
 </div>
 {% endblock %}
 
-
 {% block extra_js %}
-
+<script src="{% static 'js/date_flatpicker.js' %}"></script>
 <script src="{% static 'js/transaction_list.js' %}"></script>
 {% endblock %}

@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize date pickers
-    flatpickr('.datepicker', {
-        dateFormat: "Y-m-d",
-        allowInput: true
-    });
+
 
     // Handle search form submission
     document.querySelector('form').addEventListener('submit', function(e) {

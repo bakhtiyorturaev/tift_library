@@ -131,9 +131,7 @@
                             </thead>
                             <tbody>
                                 {% for loan in overdue_loans %}
-                                <tr class="table-danger"
-                                    style="cursor: pointer;"
-                                    onclick="window.location='{% url 'transactions:return' loan.pk %}'">
+                                <tr class="table-danger">
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ loan.book_title }}</td>
                                     <td>{{ loan.member }}</td>
