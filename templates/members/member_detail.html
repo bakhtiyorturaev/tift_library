@@ -79,7 +79,7 @@
                                     <th>Berilgan sana</th>
                                     <th>Qaytarish sanasi</th>
                                     <th>Holati</th>
-                                    <th class="text-center">Tanlash</th>
+                                    <th class="text-center"><i class="bi bi-check-square"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -100,7 +100,7 @@
                                             <span class="badge bg-info text-dark">{{ loan.days_remaining }} kun qoldi</span>
                                         {% endif %}
                                     </td>
-                                    <td class="no-click text-center">
+                                    <td class=" text-center">
                                         {% if not loan.returned %}
                                             <div class="form-check d-flex justify-content-center">
                                                 <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}">
@@ -164,9 +164,4 @@
 </div>
 
 
-
-{% endblock %}
-
-{% block extra_js %}
-    <script src="{% static 'js/no_click.js' %}"></script>
 {% endblock %}

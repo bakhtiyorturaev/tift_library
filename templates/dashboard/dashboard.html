@@ -119,24 +119,22 @@
                     {% csrf_token %}
                     <input type="hidden" name="redirect_to" value="overdue">
                     {% if overdue_loans %}
-                    <div class="table-responsive dashboard-table-scroll">
-                        <table class="table table-hover table-sm">
+                    <div class="table-responsive dashboard-table-scroll" style=" max-height: 555px; overflow-y: auto;">
+                        <table class="table table-hover table-sm ">
                             <thead class="table-light sticky-top">
                                 <tr>
-                                    <th>№</th>
                                     <th>Kitob</th>
                                     <th>Talaba</th>
-                                    <th>Qaytarish sanasi</th>
-                                    <th class="text-center">Tanlash</th>
+                                    <th>Qaytarish</th>
+                                    <th class="text-center"><i class="bi bi-check-square"></i></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="rounded-3 overflow-hidden">
                                 {% for loan in overdue_loans %}
                                 <tr class="table-danger">
-                                    <td>{{ forloop.counter }}</td>
                                     <td>{{ loan.book_title }}</td>
-                                    <td>{{ loan.member }}</td>
-                                    <td>{{ loan.return_due_date|date:"Y-m-d" }}</td>
+                                    <td >{{ loan.member }}</td>
+                                    <td style="white-space: nowrap;">{{ loan.return_due_date|date:"Y-m-d" }}</td>
                                     <td class="no-click text-center" onclick="event.stopPropagation();">
                                         {% if not loan.returned %}
                                             <div class="form-check d-flex justify-content-center">
@@ -178,21 +176,19 @@
                 <input type="hidden" name="redirect_to" value="due_soon">
                 <div class="card-body">
                     {% if upcoming_returns %}
-                    <div class="table-responsive dashboard-table-scroll">
+                    <div class="table-responsive dashboard-table-scroll" style=" max-height: 555px; overflow-y: auto;">
                         <table class="table table-hover table-sm">
                             <thead class="table-light sticky-top">
                                 <tr>
                                     <th>Kitob</th>
                                     <th>Talaba</th>
-                                    <th>Qaytarish sanasi</th>
-                                    <th class="text-center">Tanlash</th>
+                                    <th>Qaytarish</th>
+                                    <th class="text-center"><i class="bi bi-check-square"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for loan in upcoming_returns %}
-                                <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}"
-                                    onclick="window.location='{% url 'transactions:return' loan.pk %}'"
-                                    style="cursor:pointer;"     >
+                                <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}">
                                     <td>{{ loan.book_title }}</td>
                                     <td>{{ loan.member }}</td>
                                     <td>
@@ -239,6 +235,4 @@
 {% endif %}
 {% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/dashboard.js' %}"></script>
-{% endblock %}
+

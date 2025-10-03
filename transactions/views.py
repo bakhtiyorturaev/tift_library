@@ -71,7 +71,7 @@ class TransactionCreateView(LibrarianTransactionsMixin, LoginRequiredMixin, Crea
     model = Transaction
     form_class = TransactionForm
     template_name = 'transactions/transaction_form.html'
-    success_url = reverse_lazy('transactions:list')
+    success_url = reverse_lazy('dashboard:dashboard')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -169,6 +169,10 @@ class BulkConfirmView(View):
 
         if not selected_ids:
             messages.warning(request, "❌ Hech qanday kitob tanlanmadi")
+            if redirect_to == "overdue":
+                return redirect(reverse("dashboard:dashboard") + "?overdue=true")
+            elif redirect_to == "due_soon":
+                return redirect(reverse("dashboard:dashboard") + "?due_soon=true")
             return redirect(reverse("transactions:list"))
 
         # Tanlangan transactionlarni qaytarilgan qilib belgilash
