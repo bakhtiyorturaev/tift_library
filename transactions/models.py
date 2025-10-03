@@ -1,9 +1,8 @@
 from datetime import timedelta
-
 from django.conf import settings
-from django.db import models
 from django.utils import timezone
 from members.models import Member
+from django.db import models
 
 class Transaction(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE, verbose_name='Talaba')

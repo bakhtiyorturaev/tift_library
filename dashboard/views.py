@@ -1,11 +1,10 @@
-from datetime import timedelta
-
-from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils import timezone
 from dashboard.mixins import LibrarianTransactionsMixin
-from members.models import Member
+from django.views.generic import TemplateView
 from transactions.models import Transaction
+from members.models import Member
+from django.utils import timezone
+from datetime import timedelta
 
 class DashboardView(LibrarianTransactionsMixin,LoginRequiredMixin,TemplateView):
     template_name = 'dashboard/dashboard.html'

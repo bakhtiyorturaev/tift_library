@@ -1,17 +1,16 @@
-from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
-from django.urls import reverse
-from django.views.generic import ListView, DetailView, UpdateView
-from django.core.paginator import Paginator
 from django.db.models import Q, F, ExpressionWrapper, IntegerField, Case, When
-from django.db.models.functions import Now, TruncDate
-from django.views.generic.base import View
-
+from django.views.generic import ListView, DetailView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from dashboard.mixins import LibrarianTransactionsMixin
+from django.db.models.functions import Now, TruncDate
+from django.core.paginator import Paginator
+from django.views.generic.base import View
 from transactions.models import Transaction
-from .models import Member
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.urls import reverse
 from .forms import MemberForm
+from .models import Member
 
 
 class MemberListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListView):

@@ -38,23 +38,3 @@ class TransactionForm(forms.ModelForm):
             raise forms.ValidationError("Qaytarish muddati hozirgi vaqtdan keyin bo‘lishi kerak")
         return return_due_date
 
-
-class TransactionReturnForm(forms.ModelForm):
-    class Meta:
-        model = Transaction
-        fields = ['returned']
-        labels = {
-            'returned': 'Kitob qaytarildi',
-        }
-        widgets = {
-            'returned': forms.CheckboxInput(
-                attrs={'class': 'form-check-input', 'id': 'returned-id'}
-            ),
-        }
-
-    def clean_returned(self):
-        returned = self.cleaned_data.get('returned')
-        if self.instance.returned and returned:
-            raise forms.ValidationError("Bu kitob allaqachon qaytarilgan")
-        return returned
-

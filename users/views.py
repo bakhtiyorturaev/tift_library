@@ -1,7 +1,7 @@
 from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import reverse_lazy
 from dashboard.mixins import LibrarianTransactionsMixin
 from .forms import CustomAuthenticationForm
+from django.urls import reverse_lazy
 
 
 class CustomLoginView(LibrarianTransactionsMixin, LoginView):

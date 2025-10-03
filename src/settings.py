@@ -4,12 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 SECRET_KEY = os.getenv('SECRET_KEY')
 ADMIN_URL = os.getenv('ADMIN_URL')
 
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -66,20 +64,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'src.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -102,17 +92,15 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'dashboard:dashboard'
 LOGOUT_REDIRECT_URL = 'users:login'
-LANGUAGE_CODE = 'uz'  # O'zbekcha
+LANGUAGE_CODE = 'uz'
 USE_I18N = True
 TIME_ZONE = 'Asia/Tashkent'
 USE_L10N = True
 USE_TZ = True
 
-
+# Static files (CSS, JavaScript, Images)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -125,10 +113,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 
+# Sessiya muddati (sekundlarda)
+SESSION_COOKIE_AGE = 8 * 24 * 60 * 60   # 8 kun
+
 CSRF_COOKIE_SECURE = False       # Faqat HTTPS orqali yuboriladi
 SESSION_COOKIE_SECURE = False    # HTTPS orqali yuboriladi
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Brauzer yopilganda sessiya tugaydi
-SECURE_SSL_REDIRECT = False  # True har doim HTTPSga yo‘naltiradi
+SECURE_SSL_REDIRECT = False       # True har doim HTTPSga yo‘naltiradi
+SESSION_COOKIE_HTTPONLY = True     # JS orqali o‘qib bo‘lmaydi
 
 
 CRONJOBS = [
