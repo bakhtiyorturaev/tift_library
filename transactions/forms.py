@@ -3,6 +3,7 @@ from django.utils import timezone
 from .models import Transaction
 from datetime import timedelta
 
+
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
@@ -11,11 +12,7 @@ class TransactionForm(forms.ModelForm):
             'book_title': forms.TextInput(attrs={'class': 'form-control'}),
             'book_id': forms.TextInput(attrs={'class': 'form-control'}),
             'return_due_date': forms.DateTimeInput(
-                attrs={
-                    'class': 'form-control',
-                    'type': 'datetime-local'
-                },
-                format='%Y-%m-%dT%H:%M'
+                attrs={'class': 'form-control datetimepicker'}
             ),
         }
         labels = {
@@ -24,17 +21,14 @@ class TransactionForm(forms.ModelForm):
             'return_due_date': 'Qaytarish muddati',
         }
 
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Default 7 kun keyin qaytarish muddati qo'yiladi
         if not self.instance.pk:
             default_due = timezone.now() + timedelta(days=7)
             self.initial.setdefault(
                 'return_due_date',
-                default_due.strftime('%Y-%m-%dT%H:%M')
+                default_due.strftime('%Y-%m-%d %H:%M')
             )
-
 
     def clean_return_due_date(self):
         return_due_date = self.cleaned_data.get('return_due_date')

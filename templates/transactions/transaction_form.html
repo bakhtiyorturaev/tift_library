@@ -4,138 +4,121 @@
 
 {% block title %}Yangi ijara{% endblock %}
 {% block page_title %}Kitobni ijaraga berish{% endblock %}
-<link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
 {% block content %}
 <div class="row">
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-body">
-                <form method="post" novalidate>
-                    {% csrf_token %}
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
 
-                    <hr class="my-4">
+          <!-- 🧍‍♂️ Talaba haqida forma -->
+          <h5 class="mb-3">🧍‍♂️ Talaba</h5>
 
-                    <!-- 🧍‍♂️ Talaba haqida forma (MemberForm) -->
-                    <h5 class="mb-3">🧍‍♂️ Talaba </h5>
+          <!-- Ism Familiya -->
+          <div class="mb-3">
+            <label for="full-name-input" class="form-label">Ism Familiya</label>
+            {% render_field member_form.full_name class="form-control" id="full-name-input" list="member-list" autocomplete="off" %}
+            <datalist id="member-list">
+              {% for member in members %}
+              <option value="{{ member.full_name }}"
+                      data-student-id="{{ member.student_id }}"
+                      data-phone="{{ member.phone }}">
+                {{ member.phone }}
+              </option>
+              {% endfor %}
+            </datalist>
+            {% if member_form.full_name.errors %}
+              <div class="invalid-feedback d-block">{{ member_form.full_name.errors.as_text }}</div>
+            {% endif %}
+          </div>
 
-                    <!-- Ism Familiya -->
-                    <div class="mb-3">
-                        <label class="form-label" for="full-name-input">Ism Familiya</label>
-                        {% render_field member_form.full_name class="form-control" id="full-name-input" list="member-list" autocomplete="off" %}
-                        <datalist id="member-list">
-                            {% for member in members %}
-                            <option value="{{ member.full_name }}"
-                                    data-student-id="{{ member.student_id }}"
-                                    data-phone="{{ member.phone }}">
-                                {{ member.phone }}
-                            </option>
-                            {% endfor %}
-                        </datalist>
-                        {% if member_form.full_name.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ member_form.full_name.errors.as_text }}
-                            </div>
-                        {% endif %}
-                    </div>
+          <!-- Talaba ID -->
+          <div class="mb-3">
+            <label for="student-id-field" class="form-label">Talaba ID</label>
+            {% render_field member_form.student_id class="form-control" id="student-id-field" list="id-list" autocomplete="off" %}
+            <datalist id="id-list">
+              {% for member in members %}
+              <option value="{{ member.student_id }}"
+                      data-full-name="{{ member.full_name }}"
+                      data-phone="{{ member.phone }}">
+                {{ member.full_name }}
+              </option>
+              {% endfor %}
+            </datalist>
+            {% if member_form.student_id.errors %}
+              <div class="invalid-feedback d-block">{{ member_form.student_id.errors.as_text }}</div>
+            {% endif %}
+          </div>
 
-                    <!-- Talaba ID -->
-                    <div class="mb-3">
-                        <label class="form-label" for="student-id-field">Talaba ID</label>
-                        {% render_field member_form.student_id class="form-control" id="student-id-field" list="id-list" autocomplete="off" %}
-                        <datalist id="id-list">
-                            {% for member in members %}
-                            <option value="{{ member.student_id }}"
-                                    data-full-name="{{ member.full_name }}"
-                                    data-phone="{{ member.phone }}">
-                                {{ member.full_name }}
-                            </option>
-                            {% endfor %}
-                        </datalist>
-                        {% if member_form.student_id.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ member_form.student_id.errors.as_text }}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Telefon raqami -->
-                    <div class="mb-3">
-                        <label for="phone-field" class="form-label">Telefon raqami</label>
-                        <div class="input-group">
-                            <span class="input-group-text">+998</span>
-                            {% render_field member_form.phone class="form-control" id="phone-field" list="phone-list" placeholder="901234567" maxlength="9" autocomplete="off" %}
-                            <datalist id="phone-list">
-                                {% for member in members %}
-                                <option value="{{ member.phone }}"
-                                        data-full-name="{{ member.full_name }}"
-                                        data-student-id="{{ member.student_id }}">
-                                    {{ member.full_name }}
-                                </option>
-                                {% endfor %}
-                            </datalist>
-                        </div>
-                        {% if member_form.phone.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ member_form.phone.errors.as_text }}
-                            </div>
-                        {% endif %}
-                    </div>
-
-
-                    <hr class="my-4">
-                    <!-- 📚 Kitob haqida forma (TransactionForm qolgan maydonlari) -->
-                    <h5 class="mb-3">📚 Kitob </h5>
-
-                    <div class="mb-3">
-                        <label class="form-label" for="{{ form.book_title.id_for_label }}">Kitob nomi</label>
-                        {% render_field form.book_title class="form-control" %}
-                        {% if form.book_title.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.book_title.errors.as_text }}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label" for="{{ form.book_id.id_for_label }}">Kitob ID</label>
-                        {% render_field form.book_id class="form-control" %}
-                        {% if form.book_id.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.book_id.errors.as_text }}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label" for="{{ form.return_due_date.id_for_label }}">Qaytarish sanasi</label>
-                        {% render_field form.return_due_date class="form-control datetimepicker" %}
-                        {% if form.return_due_date.errors %}
-                            <div class="invalid-feedback d-block">
-                                {{ form.return_due_date.errors.as_text }}
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- 🔘 Tugmalar -->
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left me-1"></i> Ortga
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-save me-1"></i> Saqlash
-                        </button>
-                    </div>
-
-                </form>
+          <!-- Telefon raqami -->
+          <div class="mb-3">
+            <label for="phone-field" class="form-label">Telefon raqami</label>
+            <div class="input-group">
+              <span class="input-group-text">+998</span>
+              {% render_field member_form.phone class="form-control" id="phone-field" list="phone-list" placeholder="901234567" maxlength="9" autocomplete="off" %}
+              <datalist id="phone-list">
+                {% for member in members %}
+                <option value="{{ member.phone }}"
+                        data-full-name="{{ member.full_name }}"
+                        data-student-id="{{ member.student_id }}">
+                  {{ member.full_name }}
+                </option>
+                {% endfor %}
+              </datalist>
             </div>
-        </div>
+            {% if member_form.phone.errors %}
+              <div class="invalid-feedback d-block">{{ member_form.phone.errors.as_text }}</div>
+            {% endif %}
+          </div>
+
+          <hr class="my-4">
+
+          <!-- 📚 Kitob haqida forma -->
+          <h5 class="mb-3">📚 Kitob</h5>
+
+          <div class="mb-3">
+            <label for="{{ form.book_title.id_for_label }}" class="form-label">Kitob nomi</label>
+            {% render_field form.book_title class="form-control" %}
+            {% if form.book_title.errors %}
+              <div class="invalid-feedback d-block">{{ form.book_title.errors.as_text }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.book_id.id_for_label }}" class="form-label">Kitob ID</label>
+            {% render_field form.book_id class="form-control" %}
+            {% if form.book_id.errors %}
+              <div class="invalid-feedback d-block">{{ form.book_id.errors.as_text }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.return_due_date.id_for_label }}" class="form-label">Qaytarish sanasi</label>
+            {% render_field form.return_due_date class="form-control datetimepicker" %}
+            {% if form.return_due_date.errors %}
+              <div class="invalid-feedback d-block">{{ form.return_due_date.errors.as_text }}</div>
+            {% endif %}
+          </div>
+
+          <!-- 🔘 Tugmalar -->
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'transactions:list' %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left me-1"></i> Ortga
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save me-1"></i> Saqlash
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'flatpickr/l10n/uz.js' %}"></script>
-
+<script src="{% static 'js/date_time_flatpicker.js' %}"></script>
 <script src="{% static 'js/transaction_form.js' %}"></script>
 {% endblock %}

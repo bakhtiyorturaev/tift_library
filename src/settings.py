@@ -102,9 +102,9 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'dashboard:dashboard'
 LOGOUT_REDIRECT_URL = 'users:login'
-
-TIME_ZONE = 'Asia/Tashkent'
+LANGUAGE_CODE = 'uz'  # O'zbekcha
 USE_I18N = True
+TIME_ZONE = 'Asia/Tashkent'
 USE_L10N = True
 USE_TZ = True
 

@@ -9,3 +9,4 @@ class MemberAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     date_hierarchy = 'created_at'
     list_per_page = 20
+    readonly_fields = ('created_at', 'updated_at', 'created_by')

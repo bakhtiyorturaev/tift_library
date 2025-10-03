@@ -6,31 +6,39 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-5">
-            <div class="card shadow-lg border-0 rounded-lg mt-5">
-                <div class="card-header">
-                    <h3 class="text-center font-weight-light my-4">Kutubxona tizimiga kirish</h3>
+            <div class="card shadow-sm border-0 rounded-3 mt-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="my-2">📚 Kutubxona tizimiga kirish</h4>
                 </div>
                 <div class="card-body">
                     <form method="post" action="{% url 'users:login' %}">
                         {% csrf_token %}
+
                         {% if form.errors %}
-                        <div class="alert alert-danger">
-                            Noto'g'ri foydalanuvchi nomi yoki parol.
-                        </div>
+                            <div class="alert alert-danger text-center">
+                                ❌ Noto'g'ri foydalanuvchi nomi yoki parol
+                            </div>
                         {% endif %}
 
                         <div class="form-floating mb-3">
-                            <input class="form-control" id="username" type="text" name="username" placeholder="Foydalanuvchi nomi" required/>
+                            <input type="text" name="username" class="form-control" id="username" placeholder="Foydalanuvchi nomi" required>
                             <label for="username">Foydalanuvchi nomi</label>
                         </div>
+
                         <div class="form-floating mb-3">
-                            <input class="form-control" id="password" type="password" name="password" placeholder="Parol" required/>
+                            <input type="password" name="password" class="form-control" id="password" placeholder="Parol" required>
                             <label for="password">Parol</label>
                         </div>
-                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                            <button type="submit" class="btn btn-primary w-100">Kirish</button>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Kirish
+                            </button>
                         </div>
                     </form>
+                </div>
+                <div class="card-footer text-center small text-muted">
+                    &copy; {{ now|date:"Y" }} Kutubxona tizimi
                 </div>
             </div>
         </div>

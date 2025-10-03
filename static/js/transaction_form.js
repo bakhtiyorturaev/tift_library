@@ -6,38 +6,36 @@ document.addEventListener('DOMContentLoaded', function () {
     const phoneField = document.getElementById('phone-field');
     const datalist = document.getElementById('member-list');
 
-    if (!fullNameInput || !studentIdField || !phoneField || !datalist) return;
+    if (fullNameInput && studentIdField && phoneField && datalist) {
+        // ✅ Ism Familiya bo‘yicha tanlansa
+        fullNameInput.addEventListener('change', function () {
+            const val = this.value.trim();
+            const option = Array.from(datalist.options).find(opt => opt.value === val);
+            if (option) {
+                studentIdField.value = option.dataset.studentId || "";
+                phoneField.value = option.dataset.phone || "";
+            }
+        });
 
-    // ✅ Ism Familiya bo‘yicha tanlansa
-    fullNameInput.addEventListener('change', function () {
-        const val = this.value.trim();
-        const option = Array.from(datalist.options).find(opt => opt.value === val);
+        // ✅ Talaba ID bo‘yicha tanlansa
+        studentIdField.addEventListener('change', function () {
+            const val = this.value.trim();
+            const option = Array.from(datalist.options).find(opt => opt.dataset.studentId === val);
+            if (option) {
+                fullNameInput.value = option.value || "";
+                phoneField.value = option.dataset.phone || "";
+            }
+        });
 
-        if (option) {
-            studentIdField.value = option.dataset.studentId || "";
-            phoneField.value = option.dataset.phone || ""; // faqat 9 raqam
-        }
-    });
+        // ✅ Telefon raqami bo‘yicha tanlansa
+        phoneField.addEventListener('change', function () {
+            const val = this.value.trim();
+            const option = Array.from(datalist.options).find(opt => opt.dataset.phone === val);
+            if (option) {
+                fullNameInput.value = option.value || "";
+                studentIdField.value = option.dataset.studentId || "";
+            }
+        });
+    }
 
-    // ✅ Talaba ID bo‘yicha tanlansa
-    studentIdField.addEventListener('change', function () {
-        const val = this.value.trim();
-        const option = Array.from(datalist.options).find(opt => opt.dataset.studentId === val);
-
-        if (option) {
-            fullNameInput.value = option.value || "";
-            phoneField.value = option.dataset.phone || "";
-        }
-    });
-
-    // ✅ Telefon raqami bo‘yicha tanlansa (faqat 9 raqam)
-    phoneField.addEventListener('change', function () {
-        const val = this.value.trim();
-        const option = Array.from(datalist.options).find(opt => opt.dataset.phone === val);
-
-        if (option) {
-            fullNameInput.value = option.value || "";
-            studentIdField.value = option.dataset.studentId || "";
-        }
-    });
 });

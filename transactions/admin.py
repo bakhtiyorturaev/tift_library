@@ -3,10 +3,8 @@ from django.contrib import admin, messages
 from django.shortcuts import render, redirect
 from django.urls import path
 from django import forms
-
 from .models import Transaction
 from users.models import User
-
 
 class TransferTransactionsForm(forms.Form):
     _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
@@ -25,6 +23,9 @@ class TransactionAdmin(admin.ModelAdmin):
     actions = ['transfer_transactions_action']
     list_per_page = 20
 
+    readonly_fields = ('member', 'given_at', 'return_due_date', 'created_by', 'returned')
+
+
     def transfer_transactions_action(self, request, queryset):
         """
         Action orqali ijaralarni yangi kutubxonchiga topshirish formini ko‘rsatish.
@@ -32,7 +33,7 @@ class TransactionAdmin(admin.ModelAdmin):
         selected = request.POST.getlist(ACTION_CHECKBOX_NAME)
         return redirect(f'./transfer_transactions/?_selected_action={",".join(selected)}')
 
-    transfer_transactions_action.short_description = "Tanlangan ijaralarni boshqa kutubxonchiga topshirish"
+    transfer_transactions_action.short_description = "Ijaralarni boshqa kutubxonchiga topshirish"
 
     def get_urls(self):
         urls = super().get_urls()

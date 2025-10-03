@@ -9,103 +9,102 @@
 <div class="row mb-1 g-3">
     <!-- Stat Cards -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card primary h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Talabalar</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_members|intcomma }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-people fs-2 text-gray-300"></i>
-                    </div>
-                </div>
+      <div class="card border-primary shadow h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="text-primary text-uppercase small fw-bold mb-1">
+                Talabalar
+              </div>
+              <div class="h5 fw-bold text-dark">{{ total_members|intcomma }}</div>
             </div>
+            <i class="bi bi-people fs-2 text-secondary"></i>
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card success h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                            Ijaradagi kitoblar</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_loans|intcomma }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-book fs-2 text-gray-300"></i>
-                    </div>
-                </div>
+      <div class="card border-success shadow h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small text-success text-uppercase fw-bold mb-1">
+                Ijaradagi kitoblar
+              </div>
+              <div class="h5 fw-bold text-dark mb-0">
+                {{ active_loans|intcomma }}
+              </div>
             </div>
+            <i class="bi bi-book fs-2 text-muted"></i>
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card danger h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                            Muddati o'tganlar</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ overdue_loans.count|intcomma }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-exclamation-triangle fs-2 text-gray-300"></i>
-                    </div>
-                </div>
+      <div class="card border-danger shadow h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small text-danger text-uppercase fw-bold mb-1">
+                Muddati o'tganlar
+              </div>
+              <div class="h5 fw-bold text-dark mb-0">
+                {{ overdue_loans.count|intcomma }}
+              </div>
             </div>
+            <i class="bi bi-exclamation-triangle fs-2 text-muted"></i>
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card warning h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                            2 oyda o‘qilgan kitoblar</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ recent_transactions_count|intcomma }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-book fs-2 text-gray-300"></i>
-                    </div>
-                </div>
+      <div class="card border-warning shadow h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small text-warning text-uppercase fw-bold mb-1">
+                2 oyda o‘qilgan kitoblar
+              </div>
+              <div class="h5 fw-bold text-dark mb-0">
+                {{ recent_transactions_count|intcomma }}
+              </div>
             </div>
+            <i class="bi bi-book fs-2 text-muted"></i>
+          </div>
         </div>
+      </div>
     </div>
 </div>
+
 {% if user.is_librarian %}
-<div class="row justify-content g-3">
+<div class="row g-3">
 
-    <!-- Quick Actions -->
-    <div class="col-12 col-md-10 col-lg-6">
-        <div class="card shadow mb-2">
-            <div class="card-body">
-                <div class="d-flex gap-2 flex-wrap justify-content-center">
-                    <a href="{% url 'transactions:create' %}" class="btn btn-success w-100">
-                        <i class="bi bi-journal-plus me-2"></i>Yangi ijara
-                    </a>
-                </div>
-            </div>
-
-        </div>
+  <!-- Quick Actions: Yangi ijara -->
+  <div class="col-12 col-md-6">
+    <div class="card shadow-sm mb-2">
+      <div class="card-body text-center">
+        <a href="{% url 'transactions:create' %}" class="btn btn-success w-100">
+          <i class="bi bi-journal-plus me-2"></i> Yangi ijara
+        </a>
+      </div>
     </div>
+  </div>
 
-    <div class="col-12 col-md-10 col-lg-6">
-        <div class="card shadow mb-4">
-            <div class="card-body">
-                <div class="d-flex gap-2 flex-wrap justify-content-center">
-                    <a href="{% url 'transactions:list' %}?returned=False" class="btn btn-primary w-100">
-                        <i class="bi bi-journal-check me-2"></i>Ijaralar tarixi
-                    </a>
-                </div>
-            </div>
-        </div>
+  <!-- Quick Actions: Ijaralar tarixi -->
+  <div class="col-12 col-md-6">
+    <div class="card shadow-sm mb-2">
+      <div class="card-body text-center">
+        <a href="{% url 'transactions:list' %}?returned=False" class="btn btn-primary w-100">
+          <i class="bi bi-journal-check me-2"></i> Ijaralar tarixi
+        </a>
+      </div>
     </div>
-
+  </div>
 </div>
+
 
 <div class="row g-3">
     <!-- Overdue Loans -->
@@ -237,50 +236,11 @@
         </div>
     </div>
 
-</div>
 {% endif %}
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize charts
-    if (document.getElementById('loansChart')) {
-        const ctx = document.getElementById('loansChart').getContext('2d');
-        const labels = JSON.parse(document.getElementById('loansChart').dataset.labels);
-        const data = JSON.parse(document.getElementById('loansChart').dataset.values);
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Ijaralar soni',
-                    data: data,
-                    backgroundColor: 'rgba(78, 115, 223, 0.8)',
-                    borderColor: 'rgba(78, 115, 223, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                }
-            }
-        });
-    }
-});
-</script>
+<script
+    src="{% static 'js/dashboard.js' %}"> </script>
 {% endblock %}
 

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
+{% load static %}
 {% block title %}Yangi ijara{% endblock %}
 {% block page_title %}Kitobni ijaraga berish{% endblock %}
 
@@ -69,16 +70,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        flatpickr('.datetimepicker', {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            allowInput: true,
-            minDate: "today",
-            defaultDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // bugundan 7 kun keyin
-        });
-    });
-</script>
+<script src="{% static 'js/date_time_flatpicker.js' %}"></script>
 {% endblock %}

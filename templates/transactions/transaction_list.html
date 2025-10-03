@@ -3,7 +3,11 @@
 {% load static %}
 
 {% block title %}Ijaralar{% endblock %}
-{% block page_title %}Ijaralar tarixi{% endblock %}
+{% block page_title %}Ijaralar ro'yxati{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
 
 {% block actions %}
 <div class="btn-group">
@@ -16,14 +20,17 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card search-form">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white"></div>
             <div class="card-body">
-                <form method="get" class="row g-3">
+                <form method="get" class="row g-3 align-items-end">
                     <div class="col-md-3">
                         <label for="search_query" class="form-label">Qidiruv</label>
                         <input type="text" class="form-control" id="search_query" name="search_query"
-                               value="{{ request.GET.search_query }}" placeholder="Kitob nomi, Ism-familiya, ID yoki telefon">
+                               value="{{ request.GET.search_query }}"
+                               placeholder="Kitob nomi, Ism-familiya, ID yoki telefon">
                     </div>
+
                     <div class="col-md-2">
                         <label for="returned" class="form-label">Holati</label>
                         <select class="form-select" id="returned" name="returned" onchange="this.form.submit()">
@@ -33,19 +40,23 @@
                             <option value="overdue" {% if request.GET.returned == 'overdue' %}selected{% endif %}>Muddati o'tgan</option>
                         </select>
                     </div>
+
                     <div class="col-md-2">
                         <label for="given_from" class="form-label">Sanadan</label>
-                        <input type="date" class="form-control datepicker" id="given_from"
+                        <input type="text" class="form-control datepicker" id="given_from"
                                name="given_from" value="{{ request.GET.given_from }}">
                     </div>
+
                     <div class="col-md-2">
                         <label for="given_to" class="form-label">Sanagacha</label>
-                        <input type="date" class="form-control datepicker" id="given_to"
+                        <input type="text" class="form-control datepicker" id="given_to"
                                name="given_to" value="{{ request.GET.given_to }}">
                     </div>
 
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary me-2">Qidirish</button>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Qidirish
+                        </button>
                     </div>
                 </form>
             </div>
@@ -169,6 +180,8 @@
 </div>
 {% endblock %}
 
+
 {% block extra_js %}
+
 <script src="{% static 'js/transaction_list.js' %}"></script>
 {% endblock %}

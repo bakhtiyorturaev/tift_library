@@ -1,19 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize date pickers
-    if (document.querySelector('.datepicker')) {
-        flatpickr('.datepicker', {
-            dateFormat: "Y-m-d",
-            allowInput: true
-        });
-    }
-
-    if (document.querySelector('.datetimepicker')) {
-        flatpickr('.datetimepicker', {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            allowInput: true
-        });
-    }
 
     // Toggle sidebar on mobile
     const sidebarToggle = document.getElementById('sidebarToggle');

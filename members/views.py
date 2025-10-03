@@ -86,7 +86,10 @@ class MemberUpdateView(LibrarianTransactionsMixin, LoginRequiredMixin, UpdateVie
         return reverse('members:detail', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
-        messages.success(self.request, 'Talaba ma\'lumotlari muvaffaqiyatli yangilandi! ✅')
+        if not form.has_changed():
+            messages.info(self.request, "Hech qanday o‘zgarish kiritilmadi ❗")
+            return redirect(self.get_success_url())
+        messages.success(self.request, "Talaba ma’lumotlari muvaffaqiyatli yangilandi ✅")
         return super().form_valid(form)
 
     def form_invalid(self, form):

@@ -4,6 +4,9 @@
 {% block title %}Talabalar{% endblock %}
 {% block page_title %}Talabalar ro'yxati{% endblock %}
 
+{% block extra_css %}
+{% endblock %}
+
 {% block actions %}
 <div class="btn-group">
     <a href="{% url 'transactions:create' %}" class="btn btn-sm btn-primary">
@@ -15,22 +18,28 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card search-form">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+
+            </div>
             <div class="card-body">
-                <form method="get" class="row g-3">
+                <form method="get" class="row g-3 align-items-end">
                     <div class="col-md-4">
                         <label for="search_query" class="form-label">Qidiruv</label>
                         <input type="text" class="form-control" id="search_query" name="search_query"
                                value="{{ request.GET.search_query }}" placeholder="Ism, Familiya, ID yoki telefon">
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary me-2">Qidirish</button>
+                    <div class="col-md-1 d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search "></i>  Qidiruv
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 
 <div class="row">
     <div class="col-12">
@@ -111,11 +120,6 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize date pickers
-    flatpickr('.datepicker', {
-        dateFormat: "Y-m-d",
-        allowInput: true
-    });
 
     // Handle search form submission
     document.querySelector('form').addEventListener('submit', function(e) {
