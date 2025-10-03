@@ -114,10 +114,11 @@
                 <h6 class="m-0 font-weight-bold text-danger">Muddati o'tgan ijaralar</h6>
             </div>
             <div class="card-body">
-                {% if overdue_loans %}
+
                 <form method="post" action="{% url 'transactions:bulk_confirm' %}">
                     {% csrf_token %}
                     <input type="hidden" name="redirect_to" value="overdue">
+                    {% if overdue_loans %}
                     <div class="table-responsive dashboard-table-scroll">
                         <table class="table table-hover table-sm">
                             <thead class="table-light sticky-top">
@@ -233,12 +234,11 @@
             </form>
         </div>
     </div>
+</div>
 
 {% endif %}
 {% endblock %}
 
 {% block extra_js %}
-<script
-    src="{% static 'js/dashboard.js' %}"> </script>
+<script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
-
