@@ -154,7 +154,7 @@ class TransactionCreateForStudentView(LibrarianTransactionsMixin, LoginRequiredM
         transaction.created_by = self.request.user
         transaction.save()
 
-        messages.success(self.request, "Ijara muvaffaqiyatli qo‘shildi ✅")
+        messages.success(self.request, "Ijara qo‘shildi ✅")
         return super().form_valid(form)
 
     def form_invalid(self, form):

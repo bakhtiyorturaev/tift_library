@@ -1,8 +1,8 @@
-from django.db.models import Q, F, ExpressionWrapper, IntegerField, Case, When
+from django.db.models import Q, F, ExpressionWrapper, IntegerField, Case, When, Value
 from django.views.generic import ListView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from dashboard.mixins import LibrarianTransactionsMixin
-from django.db.models.functions import Now, TruncDate
+from django.db.models.functions import Now, TruncDate, ExtractDay
 from django.core.paginator import Paginator
 from django.views.generic.base import View
 from transactions.models import Transaction
@@ -11,7 +11,8 @@ from django.contrib import messages
 from django.urls import reverse
 from .forms import MemberForm
 from .models import Member
-
+from django.utils import timezone
+from datetime import timedelta
 
 class MemberListView(LibrarianTransactionsMixin, LoginRequiredMixin, ListView):
     model = Member
@@ -47,22 +48,26 @@ class MemberDetailView(LibrarianTransactionsMixin, LoginRequiredMixin, DetailVie
         member = self.object
 
         # Annotatsiya: qoldiq kun va muddati o'tganmi
-        loans = (
-            Transaction.objects.filter(member=member)
-            .annotate(
-                days_left=ExpressionWrapper(
-                    TruncDate(F("return_due_date")) - TruncDate(Now()),
-                    output_field=IntegerField(),
-                ),
-                is_overdue_db=Case(
-                    When(returned=False, return_due_date__lt=Now(), then=True),
-                    default=False,
-                    output_field=IntegerField(),
-                ),
-            )
-            .order_by("returned", "return_due_date")
-        )
+        # loans = (
+        #     Transaction.objects.filter(member=member)
+        #     .annotate(
+        #         days_left=ExpressionWrapper(
+        #             ExtractDay(F("return_due_date")) - TruncDate(Now())+ Value(1),
+        #             output_field=IntegerField(),
+        #         ),
+        #         is_overdue_db=Case(
+        #             When(returned=False, return_due_date__lt=Now(), then=True),
+        #             default=False,
+        #             output_field=IntegerField(),
+        #         ),
+        #     )
+        #     .order_by("returned", "return_due_date")
+        # )
 
+        loans = Transaction.objects.filter(member=member).order_by("returned", "return_due_date")
+
+        today = timezone.localdate()
+        tomorrow = today + timedelta(days=1)
         # Paginator
         paginator = Paginator(loans, self.paginate_by)
         page_obj = paginator.get_page(self.request.GET.get("page"))
@@ -72,6 +77,8 @@ class MemberDetailView(LibrarianTransactionsMixin, LoginRequiredMixin, DetailVie
             "page_obj": page_obj,
             "is_paginated": page_obj.has_other_pages(),
             "paginator": paginator,
+            "today": today,
+            "tomorrow": tomorrow,
         })
         return context
 

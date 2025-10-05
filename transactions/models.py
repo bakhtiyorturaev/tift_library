@@ -33,13 +33,31 @@ class Transaction(models.Model):
         """Ijara muddati tugagan va qaytarilmagan"""
         return not self.returned and timezone.now() > self.return_due_date
 
+    from django.utils import timezone
+
     @property
     def days_remaining(self):
-        """Qaytarishgacha qolgan kunlar soni (agar o‘tgan bo‘lsa manfiy chiqadi)"""
+        """
+        Qaytarishgacha qolgan kunlar soni (faqat sana bo‘yicha hisoblanadi,
+        soat e'tiborga olinmaydi)
+        """
         if self.returned:
             return 0
-        remaining = self.return_due_date - timezone.now()
-        return remaining.days
+
+        # Bugungi sana (timezone asosida)
+        today = timezone.localdate()
+
+        # Qaytarish sanasi (datetime bo‘lsa ham, faqat .date() qismi olinadi)
+        due_date = (
+            self.return_due_date.date()
+            if hasattr(self.return_due_date, "date")
+            else self.return_due_date
+        )
+
+        # Kunlar farqini hisoblash
+        delta_days = (due_date - today).days
+
+        return delta_days
 
     @property
     def is_due_soon(self):

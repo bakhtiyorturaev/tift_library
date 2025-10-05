@@ -90,24 +90,26 @@
                                     <td>{{ loan.given_at|date:"Y-m-d" }}</td>
                                     <td>{{ loan.return_due_date|date:"Y-m-d" }}</td>
                                     <td>
-                                        {% if loan.returned %}
-                                            <span class="badge bg-success">Qaytarilgan</span>
-                                        {% elif loan.days_remaining < 0 %}
-                                            <span class="badge bg-danger">Muddati o'tgan</span>
-                                        {% elif loan.days_remaining == 0 %}
-                                            <span class="badge bg-warning text-dark">Bugun</span>
-                                        {% else %}
-                                            <span class="badge bg-info text-dark">{{ loan.days_remaining }} kun qoldi</span>
-                                        {% endif %}
+                                    {% if loan.returned %}
+                                        <span class="badge bg-success">Topshirilgan</span>
+                                    {% elif loan.return_due_date|date:"Y-m-d" == today|date:"Y-m-d" %}
+                                        <span class="badge bg-warning text-dark">Bugun topshiriladi</span>
+                                    {% elif loan.return_due_date|date:"Y-m-d" == tomorrow|date:"Y-m-d" %}
+                                        <span class="badge bg-info text-dark">Ertaga topshiriladi</span>
+                                    {% elif loan.return_due_date < today %}
+                                        <span class="badge bg-danger">Muddati o'tgan</span>
+                                    {% else %}
+                                        <span class="badge bg-primary text-light">{{ loan.days_remaining }} kun qoldi</span>
+                                    {% endif %}
                                     </td>
-                                    <td class=" text-center">
-                                        {% if not loan.returned %}
-                                            <div class="form-check d-flex justify-content-center">
-                                                <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}">
-                                            </div>
-                                        {% endif %}
-                                    </td>
-                                </tr>
+                                        <td class=" text-center">
+                                            {% if not loan.returned %}
+                                                <div class="form-check d-flex justify-content-center">
+                                                    <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}">
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
