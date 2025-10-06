@@ -6,45 +6,36 @@ from members.models import Member
 from django.utils import timezone
 from datetime import timedelta
 
-class DashboardView(LibrarianTransactionsMixin,LoginRequiredMixin,TemplateView):
+class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         user = self.request.user
-        today = timezone.localdate()
-        tomorrow = today + timedelta(days=1)
 
         transactions = Transaction.objects.filter(created_by=user)
 
-        # Umumiy statistikalar
+        # Overdue loans (muddati o'tgan va qaytarilmagan)
+        overdue_loans = [t for t in transactions if t.get_status()['status'] == 'overdue']
+        overdue_loans = sorted(
+            overdue_loans,
+            key=lambda x: (x.return_due_date.date(), x.book_title.lower())
+        )
+
+        # Faqat Bugun/Ertaga qaytarilishi kerak bo‘lganlar
+        upcoming_returns = [t for t in transactions if t.get_status()['status'] in ("today", "tomorrow")]
+        upcoming_returns = sorted(
+            upcoming_returns,
+            key=lambda x: (x.return_due_date.date(), x.book_title.lower())
+        )
+
         context.update({
-            'today': today,
-            'tomorrow': tomorrow,
+            'recent_transactions_count': transactions.filter(given_at__gte=timezone.now() - timedelta(days=60)).count(),
             'total_members': Member.objects.filter(created_by=user).count(),
             'active_loans': transactions.filter(returned=False).count(),
+            'upcoming_returns': upcoming_returns,
+            'overdue_loans': overdue_loans,
         })
-
-        # Muddati o'tgan ijaralar (bugungacha)
-        context['overdue_loans'] = transactions.filter(
-            return_due_date__lt=today,
-            returned=False
-        ).order_by('return_due_date')
-
-        # Muddati yaqin qolganlar (bugun yoki ertaga) va hali qaytarilmaganlar
-        context['upcoming_returns'] = transactions.filter(
-            return_due_date__date__range=(today, tomorrow),
-            returned=False
-        ).order_by('return_due_date')
-
-
-        # Oxirgi 2 oy ichida kutubxonachi (user) bo‘yicha berilgan kitoblar
-        two_months_ago = timezone.now() - timedelta(days=60)
-
-        context['recent_transactions_count'] = (
-            transactions.filter(given_at__gte=two_months_ago).count()
-        )
 
         return context
 

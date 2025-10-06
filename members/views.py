@@ -47,28 +47,8 @@ class MemberDetailView(LibrarianTransactionsMixin, LoginRequiredMixin, DetailVie
         context = super().get_context_data(**kwargs)
         member = self.object
 
-        # Annotatsiya: qoldiq kun va muddati o'tganmi
-        # loans = (
-        #     Transaction.objects.filter(member=member)
-        #     .annotate(
-        #         days_left=ExpressionWrapper(
-        #             ExtractDay(F("return_due_date")) - TruncDate(Now())+ Value(1),
-        #             output_field=IntegerField(),
-        #         ),
-        #         is_overdue_db=Case(
-        #             When(returned=False, return_due_date__lt=Now(), then=True),
-        #             default=False,
-        #             output_field=IntegerField(),
-        #         ),
-        #     )
-        #     .order_by("returned", "return_due_date")
-        # )
-
         loans = Transaction.objects.filter(member=member).order_by("returned", "return_due_date")
 
-        today = timezone.localdate()
-        tomorrow = today + timedelta(days=1)
-        # Paginator
         paginator = Paginator(loans, self.paginate_by)
         page_obj = paginator.get_page(self.request.GET.get("page"))
 
@@ -77,8 +57,8 @@ class MemberDetailView(LibrarianTransactionsMixin, LoginRequiredMixin, DetailVie
             "page_obj": page_obj,
             "is_paginated": page_obj.has_other_pages(),
             "paginator": paginator,
-            "today": today,
-            "tomorrow": tomorrow,
+            "today": timezone.localdate(),
+            "tomorrow": timezone.localdate() + timedelta(days=1),
         })
         return context
 

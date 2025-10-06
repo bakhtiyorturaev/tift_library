@@ -84,32 +84,32 @@
                             </thead>
                             <tbody>
                                 {% for loan in loans %}
-                                <tr class="{% if loan.is_overdue %}table-danger{% endif %}">
+                                <tr class="{% if loan.get_status.status == 'overdue' %}table-danger{% endif %}">
                                     <td>{{ forloop.counter }}.</td>
                                     <td>{{ loan.book_title }} - {{ loan.book_id }}</td>
                                     <td>{{ loan.given_at|date:"Y-m-d" }}</td>
                                     <td>{{ loan.return_due_date|date:"Y-m-d" }}</td>
                                     <td>
-                                    {% if loan.returned %}
-                                        <span class="badge bg-success">Topshirilgan</span>
-                                    {% elif loan.return_due_date|date:"Y-m-d" == today|date:"Y-m-d" %}
-                                        <span class="badge bg-warning text-dark">Bugun topshiriladi</span>
-                                    {% elif loan.return_due_date|date:"Y-m-d" == tomorrow|date:"Y-m-d" %}
-                                        <span class="badge bg-info text-dark">Ertaga topshiriladi</span>
-                                    {% elif loan.return_due_date < today %}
-                                        <span class="badge bg-danger">Muddati o'tgan</span>
-                                    {% else %}
-                                        <span class="badge bg-primary text-light">{{ loan.days_remaining }} kun qoldi</span>
-                                    {% endif %}
+                                        <span class="badge
+                                            {% if loan.get_status.status == 'returned' %}bg-success
+                                            {% elif loan.get_status.status == 'today' %}bg-warning text-dark
+                                            {% elif loan.get_status.status == 'tomorrow' %}bg-info text-dark
+                                            {% elif loan.get_status.status == 'overdue' %}bg-danger
+                                            {% else %}bg-info text-dark
+                                            {% endif %}">
+                                            {{ loan.days_remaining_display }}
+                                        </span>
                                     </td>
-                                        <td class=" text-center">
-                                            {% if not loan.returned %}
-                                                <div class="form-check d-flex justify-content-center">
-                                                    <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}">
-                                                </div>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
+
+                                <td class="text-center">
+                                    {% if not loan.returned %}
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}">
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
                                 {% endfor %}
                             </tbody>
                         </table>

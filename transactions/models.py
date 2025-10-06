@@ -28,41 +28,62 @@ class Transaction(models.Model):
     def __str__(self):
         return f"{self.book_title} - {self.book_id} - {self.member}"
 
-    @property
-    def is_overdue(self):
-        """Ijara muddati tugagan va qaytarilmagan"""
-        return not self.returned and timezone.now() > self.return_due_date
-
-    from django.utils import timezone
-
-    @property
-    def days_remaining(self):
+    def get_status(self):
         """
-        Qaytarishgacha qolgan kunlar soni (faqat sana bo‘yicha hisoblanadi,
-        soat e'tiborga olinmaydi)
+        Ijara holatini aniqlaydi va qaytaradi:
+        - status: 'returned', 'today', 'tomorrow', 'overdue', 'future'
+        - is_overdue: True/False
         """
-        if self.returned:
-            return 0
-
-        # Bugungi sana (timezone asosida)
-        today = timezone.localdate()
-
-        # Qaytarish sanasi (datetime bo‘lsa ham, faqat .date() qismi olinadi)
-        due_date = (
-            self.return_due_date.date()
-            if hasattr(self.return_due_date, "date")
-            else self.return_due_date
-        )
-
-        # Kunlar farqini hisoblash
-        delta_days = (due_date - today).days
-
-        return delta_days
-
-    @property
-    def is_due_soon(self):
-        """Kitobni qaytarish muddati 2 kun ichida tugasa"""
-        if self.returned:
-            return False
         now = timezone.now()
-        return now <= self.return_due_date <= now + timedelta(days=2)
+        today = timezone.localdate()
+        tomorrow = today + timedelta(days=1)
+
+        # Lokal vaqt
+        local_due = timezone.localtime(self.return_due_date)
+
+        # Status aniqlash
+        if self.returned:
+            status = "returned"
+        elif local_due.date() < today:
+            status = "overdue"
+        elif local_due.date() == today:
+            status = "today"
+        elif local_due.date() == tomorrow:
+            status = "tomorrow"
+        else:
+            status = "future"
+
+        # is_overdue flag
+        is_overdue = (status == "overdue")
+
+        return {
+            "status": status,
+            "is_overdue": is_overdue
+        }
+
+    @property
+    def overdue_days(self):
+        """Agar ijaraning muddati o'tgan bo'lsa, necha kun o'tganini qaytaradi"""
+        if self.returned or self.return_due_date >= timezone.now():
+            return 0
+        delta = timezone.now() - self.return_due_date
+        return delta.days
+
+    @property
+    def days_remaining_display(self):
+        """Inson o‘qiydigan shaklda"""
+        status = self.get_status()['status']  # <-- shu yer
+        if self.returned:
+            return "Topshirilgan"
+        elif status == "today":
+            return "Bugun"
+        elif status == "tomorrow":
+            return "Ertaga"
+        elif status == "overdue":
+            days_overdue = (timezone.localdate() - timezone.localtime(self.return_due_date).date()).days
+            return f"{days_overdue} kun o'tgan"
+        else:
+            days_remaining = (timezone.localtime(self.return_due_date).date() - timezone.localdate()).days
+            return f"{days_remaining} kun qoldi"
+
+

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load humanize %}
 {% load static %}
+{% load tz %}
 
 {% block title %}Dashboard{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
@@ -131,20 +132,25 @@
                             </thead>
                             <tbody class="rounded-3 overflow-hidden">
                                 {% for loan in overdue_loans %}
-                                <tr class="table-danger">
+                                <tr class="">
                                     <td>{{ loan.book_title }}</td>
-                                    <td >{{ loan.member }}</td>
-                                    <td style="white-space: nowrap;">{{ loan.return_due_date|date:"Y-m-d" }}</td>
+                                    <td>{{ loan.member }}</td>
+                                    <td style="white-space: nowrap;">
+                                        {{ loan.return_due_date|date:"Y-m-d" }}
+                                        <span class="badge bg-danger text-light">
+                                            {{ loan.overdue_days }} kun o'tgan
+                                        </span>
+                                    </td>
                                     <td class="no-click text-center" onclick="event.stopPropagation();">
                                         {% if not loan.returned %}
-                                            <div class="form-check d-flex justify-content-center">
-                                                <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}" onclick="event.stopPropagation();">
-                                            </div>
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}" onclick="event.stopPropagation();">
+                                        </div>
                                         {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                     <div class="d-flex justify-content-between mt-2">
@@ -186,31 +192,32 @@
                                     <th class="text-center"><i class="bi bi-check-square"></i></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {% for loan in upcoming_returns %}
-                                <tr class="{% if loan.due_soon %}table-danger{% else %}table-warning{% endif %}">
-                                    <td>{{ loan.book_title }}</td>
-                                    <td>{{ loan.member }}</td>
-                                    <td>
-                                        {{ loan.return_due_date|date:"Y-m-d" }}
-                                        <span class="badge {% if loan.is_overdue %}bg-danger{% else %}bg-warning text-dark{% endif %}">
-                                            {% if loan.return_due_date|date:"Y-m-d" == today|date:"Y-m-d" %}
-                                                Bugun
-                                            {% elif loan.return_due_date|date:"Y-m-d" == tomorrow|date:"Y-m-d" %}
-                                                Ertaga
-                                            {% endif %}
-                                        </span>
-                                    </td>
-                                    <td class="no-click text-center" onclick="event.stopPropagation();">
-                                        {% if not loan.returned %}
+                            {% for loan in upcoming_returns %}
+                                {% with stat=loan.get_status %}
+                                    <tr>
+                                        <td>{{ loan.book_title }}</td>
+                                        <td>{{ loan.member }}</td>
+                                        <td>
+                                            {{ loan.return_due_date|date:"Y-m-d" }}
+                                            <span class="badge
+                                                {% if stat.status == 'today' %}bg-warning text-dark
+                                                {% elif stat.status == 'tomorrow' %}bg-info text-dark
+                                                {% endif %}">
+                                                {% if stat.status == 'today' %}Bugun
+                                                {% elif stat.status == 'tomorrow' %}Ertaga
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if not loan.returned %}
                                             <div class="form-check d-flex justify-content-center">
-                                                <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}" onclick="event.stopPropagation();">
+                                                <input class="form-check-input" type="checkbox" name="loans" value="{{ loan.pk }}">
                                             </div>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endwith %}
+                            {% endfor %}
                         </table>
                     </div>
                     <div class="d-flex justify-content-between mt-2">

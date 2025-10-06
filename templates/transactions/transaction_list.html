@@ -86,8 +86,7 @@
                                     table-danger
                                 {% elif transaction.is_due_soon and not transaction.returned %}
                                     table-warning
-                                {% endif %}
-                            ">
+                                {% endif %}">
                             <td>{{ forloop.counter }}</td>
                             <td>{{ transaction.book_title }} - {{ transaction.book_id }}</td>
                             <td>{{ transaction.member }}</td>
