@@ -93,16 +93,17 @@
                             <td>{{ transaction.given_at|date:"Y-m-d" }}</td>
                             <td>{{ transaction.return_due_date|date:"Y-m-d" }}</td>
                             <td>
-                                {% if transaction.returned %}
-                                <span class="badge bg-success">Qaytarilgan</span>
-                                {% elif transaction.is_overdue %}
-                                <span class="badge bg-danger">Muddati o'tgan</span>
-                                {% elif transaction.is_due_soon %}
-                                <span class="badge bg-warning text-dark">Tez orada qaytarilishi kerak</span>
-                                {% else %}
-                                <span class="badge bg-primary">Faol</span>
-                                {% endif %}
+                                <span class="badge
+                                    {% if transaction.get_status.status == 'returned' %}bg-success
+                                    {% elif transaction.get_status.status == 'today' %}bg-warning text-dark
+                                    {% elif transaction.get_status.status == 'tomorrow' %}bg-info text-dark
+                                    {% elif transaction.get_status.status == 'overdue' %}bg-danger
+                                    {% else %}bg-info text-dark
+                                    {% endif %}">
+                                    {{ transaction.days_remaining_display }}
+                                </span>
                             </td>
+
                             <td class="no-click text-center" onclick="event.stopPropagation();">
                                 {% if not transaction.returned %}
                                     <div class="form-check d-flex justify-content-center">
